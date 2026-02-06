@@ -759,7 +759,7 @@ export default function StudentsPage() {
                                             <Button 
                                               variant="outline" 
                                               size="sm"
-                                              onClick={() => window.open(file.path, '_blank')}
+                                              onClick={() => window.open(`/api/files/${file.path}`, '_blank')}
                                             >
                                               عرض
                                             </Button>
