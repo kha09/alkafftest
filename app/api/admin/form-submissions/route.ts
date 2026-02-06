@@ -28,10 +28,15 @@ export async function GET(request: NextRequest) {
     console.log('Constructed where clause:', JSON.stringify(where))
 
     if (search) {
+      // Check if search is a number (ID search)
+      const searchAsNumber = parseInt(search)
+      const isNumericSearch = !isNaN(searchAsNumber)
+      
       where.OR = [
         { fullName: { contains: search } },
         { email: { contains: search } },
-        { preferredProgram: { contains: search } }
+        { preferredProgram: { contains: search } },
+        ...(isNumericSearch ? [{ id: searchAsNumber }] : [])
       ]
     }
 

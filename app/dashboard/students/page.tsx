@@ -635,6 +635,7 @@ export default function StudentsPage() {
                   <th className="text-right p-3 text-sm font-medium text-[#4b5563]">الجنسية</th>
                   <th className="text-right p-3 text-sm font-medium text-[#4b5563]">بلد الإقامة</th>
                   <th className="text-right p-3 text-sm font-medium text-[#4b5563]">مدينة الإقامة</th>
+                  <th className="text-right p-3 text-sm font-medium text-[#4b5563]">رقم الطالب</th>
                 </tr>
               </thead>
               <tbody>
@@ -944,6 +945,7 @@ export default function StudentsPage() {
                       <td className="p-3 text-sm text-[#111827]">{submission.nationality}</td>
                       <td className="p-3 text-sm text-[#111827]">{submission.countryOfResidence}</td>
                       <td className="p-3 text-sm text-[#111827]">{submission.cityOfResidence}</td>
+                      <td className="p-3 text-sm font-medium text-[#111827]">#{submission.id}</td>
                     </tr>
                   ))
                 ) : (

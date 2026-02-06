@@ -377,7 +377,7 @@ export default function AgentsPage() {
                       </Avatar>
                       <div>
                         <h3 className="font-semibold text-[#111827]">{agent.name}</h3>
-                        <p className="text-sm text-[#4b5563]">وكيل</p>
+                        <p className="text-sm text-[#4b5563]">وكيل #{agent.id}</p>
                       </div>
                     </div>
                     <Badge className="bg-green-100 text-green-800">

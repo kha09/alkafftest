@@ -23,9 +23,14 @@ export async function GET(request: NextRequest) {
     const where: any = {}
     
     if (search) {
+      // Check if search is a number (ID search)
+      const searchAsNumber = parseInt(search)
+      const isNumericSearch = !isNaN(searchAsNumber)
+      
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } }
+        { email: { contains: search, mode: 'insensitive' } },
+        ...(isNumericSearch ? [{ id: searchAsNumber }] : [])
       ]
     }
 

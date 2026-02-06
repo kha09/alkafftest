@@ -9,7 +9,13 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "ts-node scripts/seed-departments-programs.ts",
-    "seed:agents": "ts-node scripts/seed-agents.ts"
+    "seed:agents": "ts-node scripts/seed-agents.ts",
+    "seed:basic": "node scripts/seed-basic-data.js",
+    "seed:arabic": "node scripts/seed-arabic-data.js",
+    "seed:homepage": "node scripts/seed-homepage-content.js",
+    "db:reset": "node scripts/reset-database.js",
+    "db:reset-and-seed": "node scripts/reset-database.js && node scripts/seed-arabic-data.js",
+    "seed:full": "node scripts/seed-arabic-data.js && node scripts/seed-homepage-content.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
