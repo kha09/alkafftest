@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import db from '@/lib/db'
 import { University } from '@/lib/types'
-import fs from 'fs/promises'
-import path from 'path'
+import { saveFile, validateFile } from '@/lib/fileStorage'
+import { uploadFileToS3, validateS3Config } from '@/lib/s3Client'
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
@@ -91,17 +91,35 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
     const logoFile = formData.get('logo') as File | null;
     
     if (logoFile && logoFile.size > 0) {
-      // Generate unique filename
-      const fileExtension = logoFile.name.split('.').pop();
-      const fileName = `university-${Date.now()}.${fileExtension}`;
-      const filePath = path.join(process.cwd(), 'public', 'images', 'universities', fileName);
-      
-      // Save file to disk
-      const fileBuffer = Buffer.from(await logoFile.arrayBuffer());
-      await fs.writeFile(filePath, fileBuffer);
-      
-      // Set logo path to be stored in database
-      logoPath = `/images/universities/${fileName}`;
+      // Validate file
+      const validation = validateFile(logoFile, 5); // 5MB max
+      if (!validation.isValid) {
+        return NextResponse.json(
+          { error: validation.error },
+          { status: 400 }
+        );
+      }
+
+      try {
+        // Check if S3 is configured
+        const s3Config = validateS3Config();
+        
+        if (s3Config.isValid) {
+          // Upload to S3/Object Storage
+          const s3Result = await uploadFileToS3(logoFile, 'university-logos', Date.now());
+          logoPath = `/api/files/university-logos/${s3Result.key.split('/').pop()}`;
+        } else {
+          // Fallback to local storage
+          const fileResult = await saveFile(logoFile, 'university-logos', Date.now());
+          logoPath = fileResult.relativePath;
+        }
+      } catch (uploadError) {
+        console.error('Error uploading logo:', uploadError);
+        return NextResponse.json(
+          { error: 'فشل في رفع شعار الجامعة' },
+          { status: 500 }
+        );
+      }
     }
     
     // Remove fields that are computed or have default values
