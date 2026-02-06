@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
-import { v4 as uuidv4 } from 'uuid'
+import { uploadFileToS3, validateS3Config } from '@/lib/s3Client'
 import { createNotification } from '@/lib/notificationService'
 
 export async function POST(request: NextRequest) {
@@ -31,12 +29,13 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Create uploads directory if it doesn't exist
-    const uploadDir = join(process.cwd(), 'public', 'uploads')
-    try {
-      await mkdir(uploadDir, { recursive: true })
-    } catch (error) {
-      console.error('Error creating upload directory:', error)
+    // Validate S3 configuration
+    const s3Validation = validateS3Config()
+    if (!s3Validation.isValid) {
+      return NextResponse.json(
+        { error: 'خطأ في إعدادات التخزين السحابي' },
+        { status: 500 }
+      )
     }
     
     // Create form submission record first
@@ -55,7 +54,7 @@ export async function POST(request: NextRequest) {
       }
     })
     
-    // Process uploaded files
+    // Process uploaded files using S3
     const uploadedFiles = []
     const fileFields = ['highSchoolCertificate', 'personalPhoto', 'passport', 'additionalDocuments']
     
@@ -63,33 +62,29 @@ export async function POST(request: NextRequest) {
       const file = formData.get(fieldName) as File | null
       
       if (file && file.size > 0) {
-        // Generate unique filename
-        const fileExtension = file.name.split('.').pop()
-        const uniqueFilename = `${uuidv4()}.${fileExtension}`
-        const filePath = join(uploadDir, uniqueFilename)
-        
-        // Convert File to Buffer
-        const bytes = await file.arrayBuffer()
-        const buffer = Buffer.from(bytes)
-        
-        // Save file to disk
-        await writeFile(filePath, buffer)
-        
-        // Save file metadata to database with form submission ID
-        const fileRecord = await prisma.uploadedFile.create({
-          data: {
-            filename: uniqueFilename,
-            originalName: file.name,
-            path: `/uploads/${uniqueFilename}`,
-            size: file.size,
-            type: file.type,
-            formSubmission: {
-              connect: { id: formSubmission.id }
+        try {
+          // Upload file to S3
+          const s3Result = await uploadFileToS3(file, fieldName, formSubmission.id)
+          
+          // Save file metadata to database with form submission ID
+          const fileRecord = await prisma.uploadedFile.create({
+            data: {
+              filename: s3Result.key.split('/').pop() || s3Result.key,
+              originalName: file.name,
+              path: s3Result.key, // Store S3 key instead of local path
+              size: file.size,
+              type: file.type,
+              formSubmission: {
+                connect: { id: formSubmission.id }
+              }
             }
-          }
-        })
-        
-        uploadedFiles.push(fileRecord)
+          })
+          
+          uploadedFiles.push(fileRecord)
+        } catch (uploadError) {
+          console.error(`Error uploading ${fieldName}:`, uploadError)
+          // Continue with other files even if one fails
+        }
       }
     }
     
