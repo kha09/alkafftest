@@ -291,7 +291,7 @@ export function CommissionReceiptSection({ commission, onCommissionUpdate }: Com
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => window.open(commission.receiptPath!, '_blank')}
+                onClick={() => window.open(`/api/files/${commission.receiptPath!}`, '_blank')}
               >
                 <Eye className="w-4 h-4 ml-1" />
                 عرض الإيصال

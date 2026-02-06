@@ -200,7 +200,7 @@ export function VisaDocumentsSection({ submissionId }: VisaDocumentsSectionProps
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => window.open(path, '_blank')}
+                      onClick={() => window.open(`/api/files/${path}`, '_blank')}
                     >
                       <Eye className="w-4 h-4 ml-1" />
                       عرض

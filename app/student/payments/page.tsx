@@ -327,7 +327,7 @@ export default function StudentPayments() {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => window.open(receiptStatus.receiptPath!, '_blank')}
+                            onClick={() => window.open(`/api/files/${receiptStatus.receiptPath!}`, '_blank')}
                           >
                             <Eye className="w-4 h-4 ml-1" />
                             عرض الإيصال
@@ -511,7 +511,7 @@ export default function StudentPayments() {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => window.open(visaStatus.visaDocumentsPaths[0], '_blank')}
+                            onClick={() => window.open(`/api/files/${visaStatus.visaDocumentsPaths[0]}`, '_blank')}
                           >
                             <Eye className="w-4 h-4 ml-1" />
                             عرض المستندات

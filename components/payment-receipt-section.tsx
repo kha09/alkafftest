@@ -191,7 +191,7 @@ export function PaymentReceiptSection({ submissionId }: PaymentReceiptSectionPro
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => window.open(receiptData.receiptPath!, '_blank')}
+                onClick={() => window.open(`/api/files/${receiptData.receiptPath!}`, '_blank')}
               >
                 <Eye className="w-4 h-4 ml-1" />
                 عرض الإيصال
