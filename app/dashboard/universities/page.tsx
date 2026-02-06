@@ -9,7 +9,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { FileUpload } from '@/components/ui/file-upload'
+import { CountrySelect } from '@/components/ui/country-select'
+import { ColorPicker } from '@/components/ui/color-picker'
+import { EnhancedFileUpload } from '@/components/ui/enhanced-file-upload'
 
 // Extended interface for university data that includes File objects
 interface UniversityFormData extends Omit<University, 'logo'> {
@@ -51,7 +53,7 @@ export default function UniversitiesManagement() {
       students: '',
       programs: '',
       acceptance: '',
-      color: 'from-blue-500 to-purple-500',
+      color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       flag: '',
       freeOfferLetter: false
     };
@@ -131,6 +133,16 @@ export default function UniversitiesManagement() {
     }
   }
 
+  const handleCountryChange = (countryData: { country: string; flag: string }) => {
+    if (currentUniversity) {
+      setCurrentUniversity({
+        ...currentUniversity,
+        country: countryData.country,
+        flag: countryData.flag
+      })
+    }
+  }
+
   if (loading) return <div className="p-6">Loading universities...</div>
   if (error) return <div className="p-6 text-red-500">Error: {error}</div>
 
@@ -187,123 +199,158 @@ export default function UniversitiesManagement() {
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-xl font-bold text-right">
               {currentUniversity?.id ? 'تعديل الجامعة' : 'إضافة جامعة جديدة'}
             </DialogTitle>
           </DialogHeader>
           {currentUniversity && (
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  الاسم
-                </Label>
-                <Input
-                  id="name"
-                  value={currentUniversity.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="col-span-3"
+            <div className="grid gap-6 py-4">
+              {/* Basic Information Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-right border-b pb-2">المعلومات الأساسية</h3>
+                
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    اسم الجامعة
+                    <span className="text-red-500 mr-1">*</span>
+                  </Label>
+                  <Input
+                    id="name"
+                    value={currentUniversity.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    className="col-span-3"
+                    placeholder="أدخل اسم الجامعة"
+                    required
+                  />
+                </div>
+
+                <CountrySelect
+                  label="الدولة"
+                  value={{ country: currentUniversity.country, flag: currentUniversity.flag }}
+                  onChange={handleCountryChange}
+                  required
+                  placeholder="اختر دولة الجامعة"
+                />
+
+                <EnhancedFileUpload
+                  label="شعار الجامعة"
+                  value={currentUniversity.logo instanceof File ? currentUniversity.logo : null}
+                  onChange={(file) => handleInputChange('logo', file || '')}
+                  accept="image/*"
+                  maxSize={5}
+                  required
+                  preview={typeof currentUniversity.logo === 'string' ? currentUniversity.logo : undefined}
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="country" className="text-right">
-                  البلد
-                </Label>
-                <Input
-                  id="country"
-                  value={currentUniversity.country}
-                  onChange={(e) => handleInputChange('country', e.target.value)}
-                  className="col-span-3"
-                />
-              </div>
-              <FileUpload
-                label="رابط الشعار"
-                value={currentUniversity.logo}
-                onChange={(value) => handleInputChange('logo', value)}
-                placeholder="اختر صورة الشعار"
-              />
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="flag" className="text-right">
-                  العلم
-                </Label>
-                <Input
-                  id="flag"
-                  value={currentUniversity.flag}
-                  onChange={(e) => handleInputChange('flag', e.target.value)}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="ranking" className="text-right">
-                  الترتيب
-                </Label>
-                <Input
-                  id="ranking"
-                  value={currentUniversity.ranking}
-                  onChange={(e) => handleInputChange('ranking', e.target.value)}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="students" className="text-right">
-                  عدد الطلاب
-                </Label>
-                <Input
-                  id="students"
-                  value={currentUniversity.students}
-                  onChange={(e) => handleInputChange('students', e.target.value)}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="programs" className="text-right">
-                  عدد البرامج
-                </Label>
-                <Input
-                  id="programs"
-                  value={currentUniversity.programs}
-                  onChange={(e) => handleInputChange('programs', e.target.value)}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="acceptance" className="text-right">
-                  معدل القبول
-                </Label>
-                <Input
-                  id="acceptance"
-                  value={currentUniversity.acceptance}
-                  onChange={(e) => handleInputChange('acceptance', e.target.value)}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="color" className="text-right">
-                  تدرج الألوان
-                </Label>
-                <Input
-                  id="color"
-                  value={currentUniversity.color}
-                  onChange={(e) => handleInputChange('color', e.target.value)}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="freeOfferLetter" className="text-right">
-                  رسالة قبول مجانية
-                </Label>
-                <div className="col-span-3">
-                  <Switch
-                    id="freeOfferLetter"
-                    checked={currentUniversity.freeOfferLetter}
-                    onCheckedChange={(checked) => handleInputChange('freeOfferLetter', checked)}
+
+              {/* Academic Information Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-right border-b pb-2">المعلومات الأكاديمية</h3>
+                
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="ranking" className="text-right">
+                    الترتيب العالمي
+                    <span className="text-red-500 mr-1">*</span>
+                  </Label>
+                  <Input
+                    id="ranking"
+                    value={currentUniversity.ranking}
+                    onChange={(e) => handleInputChange('ranking', e.target.value)}
+                    className="col-span-3"
+                    placeholder="مثال: #150 عالمياً"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="students" className="text-right">
+                    عدد الطلاب
+                    <span className="text-red-500 mr-1">*</span>
+                  </Label>
+                  <Input
+                    id="students"
+                    value={currentUniversity.students}
+                    onChange={(e) => handleInputChange('students', e.target.value)}
+                    className="col-span-3"
+                    placeholder="مثال: 25,000+ طالب"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="programs" className="text-right">
+                    عدد البرامج
+                    <span className="text-red-500 mr-1">*</span>
+                  </Label>
+                  <Input
+                    id="programs"
+                    value={currentUniversity.programs}
+                    onChange={(e) => handleInputChange('programs', e.target.value)}
+                    className="col-span-3"
+                    placeholder="مثال: 200+ برنامج"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="acceptance" className="text-right">
+                    معدل القبول
+                    <span className="text-red-500 mr-1">*</span>
+                  </Label>
+                  <Input
+                    id="acceptance"
+                    value={currentUniversity.acceptance}
+                    onChange={(e) => handleInputChange('acceptance', e.target.value)}
+                    className="col-span-3"
+                    placeholder="مثال: 75%"
+                    required
                   />
                 </div>
               </div>
-              <div className="flex justify-end">
-                <Button onClick={handleSave}>
-                  {currentUniversity.id ? 'تحديث' : 'إنشاء'}
+
+              {/* Visual Settings Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-right border-b pb-2">الإعدادات المرئية</h3>
+                
+                <ColorPicker
+                  label="لون الخلفية"
+                  value={currentUniversity.color}
+                  onChange={(color) => handleInputChange('color', color)}
+                  required
+                  placeholder="اختر لون أو تدرج للخلفية"
+                />
+              </div>
+
+              {/* Additional Settings Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-right border-b pb-2">إعدادات إضافية</h3>
+                
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="freeOfferLetter" className="text-right">
+                    رسالة قبول مجانية
+                  </Label>
+                  <div className="col-span-3 flex items-center gap-2">
+                    <Switch
+                      id="freeOfferLetter"
+                      checked={currentUniversity.freeOfferLetter}
+                      onCheckedChange={(checked) => handleInputChange('freeOfferLetter', checked)}
+                    />
+                    <span className="text-sm text-gray-600">
+                      {currentUniversity.freeOfferLetter ? 'متاحة مجاناً' : 'غير متاحة مجاناً'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  إلغاء
+                </Button>
+                <Button onClick={handleSave} className="min-w-[100px]">
+                  {currentUniversity.id ? 'تحديث الجامعة' : 'إضافة الجامعة'}
                 </Button>
               </div>
             </div>

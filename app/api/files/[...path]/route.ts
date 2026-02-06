@@ -20,7 +20,8 @@ export async function GET(
       filePath.startsWith('additionalDocuments/') ||
       filePath.startsWith('payment-receipts/') ||
       filePath.startsWith('visa-documents/') ||
-      filePath.startsWith('commission-receipts/')
+      filePath.startsWith('commission-receipts/') ||
+      filePath.startsWith('university-logos/')
     )
     
     if (isS3Key) {
