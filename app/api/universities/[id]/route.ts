@@ -122,7 +122,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
       }
     }
     
-    // Remove fields that are computed or have default values
+    // Remove fields that are computed or have default values (but keep color field)
     const { id, nameEn, location, tuitionFee, currency, courses, rating, popular, featured, specializations, departments, logo, ...universityFields } = universityData;
     
     const updatedUniversity = await db.university.update({
