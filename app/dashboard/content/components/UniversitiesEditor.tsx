@@ -12,7 +12,6 @@ import { CountrySelect } from '@/components/ui/country-select'
 import { ColorPicker } from '@/components/ui/color-picker'
 import { Plus, Trash2, GraduationCap, AlertCircle, Building2, Users, BookOpen, TrendingUp, Award } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { saveFile } from '@/lib/fileStorage'
 
 interface UniversitiesEditorProps {
   universities: University[]
@@ -51,9 +50,24 @@ export default function UniversitiesEditor({ universities, onChange }: Universit
   const handleLogoUpload = async (index: number, file: File | null) => {
     if (file) {
       try {
-        // Upload the file to the storage service
-        const result = await saveFile(file, 'homepage/universities', `university-${index}`)
-        updateUniversity(index, 'logo', result.relativePath)
+        // Create FormData for the API request
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('category', 'homepage/universities')
+        formData.append('identifier', `university-${index}`)
+
+        // Upload the file using the API endpoint
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
+
+        if (!response.ok) {
+          throw new Error('Upload failed')
+        }
+
+        const result = await response.json()
+        updateUniversity(index, 'logo', result.filePath)
       } catch (error) {
         console.error('Error uploading logo:', error)
         // Fallback to creating a local URL for preview
