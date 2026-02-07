@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { LanguageSwitcher } from '@/components/language-switcher'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
@@ -184,6 +185,7 @@ export default function ProgramDetailPage() {
             </nav>
 
             <div className="flex items-center space-x-4 space-x-reverse">
+              <LanguageSwitcher />
               <Button variant="outline" className="hidden md:inline-flex">
                 تسجيل الدخول
               </Button>

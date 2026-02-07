@@ -13,15 +13,8 @@ export async function GET(request: Request) {
       },
       include: {
         department: {
-          where: {
-            language: language
-          },
           include: {
-            university: {
-              where: {
-                language: language
-              }
-            }
+            university: true
           }
         }
       }

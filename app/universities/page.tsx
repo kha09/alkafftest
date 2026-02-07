@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { University, Department } from "@/lib/types"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { LanguageSwitcher } from "@/components/language-switcher"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -184,6 +185,7 @@ export default function UniversitiesPage() {
             </nav>
 
             <div className="flex items-center space-x-4 space-x-reverse">
+              <LanguageSwitcher />
               <Button variant="outline" className="hidden md:inline-flex">
                 تسجيل الدخول
               </Button>
