@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { LanguageSwitcher } from '@/components/language-switcher'
+import { useLanguage } from '@/contexts/LanguageContext'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -29,6 +30,7 @@ import { ApplicationForm } from '@/components/application-form'
 export default function UniversityDetailPage() {
   const params = useParams()
   const universityId = params.id
+  const { language } = useLanguage()
   
   const [university, setUniversity] = useState<University | null>(null)
   const [loading, setLoading] = useState(true)
@@ -63,8 +65,9 @@ export default function UniversityDetailPage() {
   const fetchUniversity = async (filters = {}) => {
     try {
       setLoading(true)
-      const queryParams = new URLSearchParams(filters as any).toString()
-      const url = `/api/universities/${universityId}${queryParams ? `?${queryParams}` : ''}`
+      const allParams = { language, ...filters }
+      const queryParams = new URLSearchParams(allParams as any).toString()
+      const url = `/api/universities/${universityId}?${queryParams}`
       const response = await fetch(url)
       
       if (!response.ok) {
@@ -95,7 +98,7 @@ export default function UniversityDetailPage() {
     if (universityId) {
       fetchUniversity()
     }
-  }, [universityId])
+  }, [universityId, language])
 
   // Apply filters when filter values change (with debouncing for search)
   useEffect(() => {

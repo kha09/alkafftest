@@ -12,10 +12,13 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { JsonEditor } from '@/components/ui/json-editor'
+import { Badge } from '@/components/ui/badge'
+import { Globe } from 'lucide-react'
 
 export default function ProgramsManagement() {
   const [programs, setPrograms] = useState<Program[]>([])
   const [departments, setDepartments] = useState<Department[]>([])
+  const [selectedLanguage, setSelectedLanguage] = useState<'ar' | 'en'>('ar')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -23,14 +26,14 @@ export default function ProgramsManagement() {
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [selectedLanguage])
 
   const fetchData = async () => {
     try {
       setLoading(true)
       const [programsRes, departmentsRes] = await Promise.all([
-        fetch('/api/programs'),
-        fetch('/api/departments')
+        fetch(`/api/programs?language=${selectedLanguage}`),
+        fetch(`/api/departments?language=${selectedLanguage}`)
       ])
 
       if (!programsRes.ok || !departmentsRes.ok) {
@@ -113,7 +116,7 @@ export default function ProgramsManagement() {
       }
       
       const method = currentProgram.id ? 'PUT' : 'POST'
-      const url = currentProgram.id ? `/api/programs/${currentProgram.id}` : '/api/programs'
+      const url = currentProgram.id ? `/api/programs/${currentProgram.id}?language=${selectedLanguage}` : `/api/programs?language=${selectedLanguage}`
       
       const response = await fetch(url, {
         method,
@@ -148,8 +151,30 @@ export default function ProgramsManagement() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">إدارة البرامج</h1>
-        <Button onClick={handleCreate}>إضافة برنامج جديد</Button>
+        <div>
+          <h1 className="text-2xl font-bold">إدارة البرامج</h1>
+          <p className="text-muted-foreground mt-1">
+            إدارة وتحرير البرامج الأكاديمية في الجامعات
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Globe className="h-4 w-4 text-muted-foreground" />
+            <Select value={selectedLanguage} onValueChange={(value: 'ar' | 'en') => setSelectedLanguage(value)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ar">العربية</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Badge variant="outline" className="text-xs">
+            {programs.length} برنامج
+          </Badge>
+          <Button onClick={handleCreate}>إضافة برنامج جديد</Button>
+        </div>
       </div>
 
       <Card>

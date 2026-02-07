@@ -34,6 +34,10 @@ export async function POST(request: Request) {
   try {
     const body: Program = await request.json()
     
+    // Get language parameter
+    const { searchParams } = new URL(request.url)
+    const language = searchParams.get('language') || 'ar'
+    
     // Extract the department ID from the department object if it exists
     const departmentId = body.department?.id
     
@@ -50,6 +54,7 @@ export async function POST(request: Request) {
         classType: body.classType,
         yearlyTuitionFees: body.yearlyTuitionFees,
         otherFees: body.otherFees,
+        language: language,
         ...(departmentId && {
           department: {
             connect: { id: departmentId }

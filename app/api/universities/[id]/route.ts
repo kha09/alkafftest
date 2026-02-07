@@ -152,14 +152,22 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
       }
     }
     
+    // Get language parameter
+    const { searchParams } = new URL(request.url)
+    const language = searchParams.get('language') || 'ar'
+    
     // Remove fields that are computed or have default values (but keep color field)
     const { id, nameEn, location, tuitionFee, currency, courses, rating, popular, featured, specializations, departments, logo, ...universityFields } = universityData;
     
     const updatedUniversity = await db.university.update({
-      where: { id: universityId },
+      where: { 
+        id: universityId,
+        language: language
+      },
       data: {
         ...universityFields,
-        logo: logoPath
+        logo: logoPath,
+        language: language
       }
     });
 

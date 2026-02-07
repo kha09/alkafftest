@@ -133,6 +133,10 @@ export async function POST(request: Request) {
     const universityJson = formData.get('university') as string;
     const universityData: any = JSON.parse(universityJson);
     
+    // Get language parameter
+    const { searchParams } = new URL(request.url)
+    const language = searchParams.get('language') || 'ar'
+    
     // Handle logo file upload
     let logoPath = universityData.logo; // Default to existing logo URL if no file is uploaded
     const logoFile = formData.get('logo') as File | null;
@@ -176,6 +180,7 @@ export async function POST(request: Request) {
       data: {
         ...universityFields,
         logo: logoPath,
+        language: language,
         order: 0 // Default order value
       }
     });

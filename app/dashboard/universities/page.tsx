@@ -38,7 +38,7 @@ export default function UniversitiesManagement() {
   const fetchUniversities = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/universities?lang=${selectedLanguage}`)
+      const response = await fetch(`/api/universities?language=${selectedLanguage}`)
       if (!response.ok) throw new Error('Failed to fetch universities')
       const data = await response.json()
       setUniversities(data)
@@ -99,7 +99,7 @@ export default function UniversitiesManagement() {
     
     try {
       const method = currentUniversity.id ? 'PUT' : 'POST'
-      const url = currentUniversity.id ? `/api/universities/${currentUniversity.id}?lang=${selectedLanguage}` : `/api/universities?lang=${selectedLanguage}`
+      const url = currentUniversity.id ? `/api/universities/${currentUniversity.id}?language=${selectedLanguage}` : `/api/universities?language=${selectedLanguage}`
       
       // Create FormData object
       const formData = new FormData()

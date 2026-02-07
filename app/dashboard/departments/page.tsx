@@ -9,10 +9,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { Globe } from 'lucide-react'
 
 export default function DepartmentsManagement() {
   const [departments, setDepartments] = useState<Department[]>([])
   const [universities, setUniversities] = useState<University[]>([])
+  const [selectedLanguage, setSelectedLanguage] = useState<'ar' | 'en'>('ar')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -20,14 +23,14 @@ export default function DepartmentsManagement() {
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [selectedLanguage])
 
   const fetchData = async () => {
     try {
       setLoading(true)
       const [departmentsRes, universitiesRes] = await Promise.all([
-        fetch('/api/departments'),
-        fetch('/api/universities')
+        fetch(`/api/departments?language=${selectedLanguage}`),
+        fetch(`/api/universities?language=${selectedLanguage}`)
       ])
 
       if (!departmentsRes.ok || !universitiesRes.ok) {
@@ -83,7 +86,7 @@ export default function DepartmentsManagement() {
     
     try {
       const method = currentDepartment.id ? 'PUT' : 'POST'
-      const url = currentDepartment.id ? `/api/departments/${currentDepartment.id}` : '/api/departments'
+      const url = currentDepartment.id ? `/api/departments/${currentDepartment.id}?language=${selectedLanguage}` : `/api/departments?language=${selectedLanguage}`
       
       const response = await fetch(url, {
         method,
@@ -118,8 +121,30 @@ export default function DepartmentsManagement() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">إدارة الأقسام</h1>
-        <Button onClick={handleCreate}>إضافة قسم جديد</Button>
+        <div>
+          <h1 className="text-2xl font-bold">إدارة الأقسام</h1>
+          <p className="text-muted-foreground mt-1">
+            إدارة وتحرير الأقسام الأكاديمية في الجامعات
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Globe className="h-4 w-4 text-muted-foreground" />
+            <Select value={selectedLanguage} onValueChange={(value: 'ar' | 'en') => setSelectedLanguage(value)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ar">العربية</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Badge variant="outline" className="text-xs">
+            {departments.length} قسم
+          </Badge>
+          <Button onClick={handleCreate}>إضافة قسم جديد</Button>
+        </div>
       </div>
 
       <Card>

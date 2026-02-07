@@ -35,12 +35,17 @@ export async function POST(request: Request) {
   try {
     const body: Department = await request.json()
     
+    // Get language parameter
+    const { searchParams } = new URL(request.url)
+    const language = searchParams.get('language') || 'ar'
+    
     // Extract the university ID from the university object if it exists
     const universityId = body.university?.id
     
     const newDepartment = await db.department.create({
       data: {
         name: body.name,
+        language: language,
         ...(universityId && { universityId })
       },
       include: {

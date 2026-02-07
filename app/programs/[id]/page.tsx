@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { LanguageSwitcher } from '@/components/language-switcher'
+import { useLanguage } from '@/contexts/LanguageContext'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
@@ -33,6 +34,7 @@ import { ApplicationForm } from '@/components/application-form'
 export default function ProgramDetailPage() {
   const params = useParams()
   const programId = params.id
+  const { language } = useLanguage()
   
   const [program, setProgram] = useState<Program | null>(null)
   const [loading, setLoading] = useState(true)
@@ -48,7 +50,8 @@ export default function ProgramDetailPage() {
     const fetchProgram = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`/api/programs/${programId}`)
+        const queryParams = new URLSearchParams({ language }).toString()
+        const response = await fetch(`/api/programs/${programId}?${queryParams}`)
         
         if (!response.ok) {
           throw new Error('Failed to fetch program details')
@@ -67,7 +70,7 @@ export default function ProgramDetailPage() {
     if (programId) {
       fetchProgram()
     }
-  }, [programId])
+  }, [programId, language])
 
   const handleCopy = () => {
     if (program) {
