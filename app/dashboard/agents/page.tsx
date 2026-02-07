@@ -25,6 +25,16 @@ import {
 import { toast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 // Types
 type Agent = {
@@ -51,6 +61,8 @@ export default function AgentsPage() {
   const [agentPhone, setAgentPhone] = useState("")
   const [agentPassword, setAgentPassword] = useState("")
   const [dialogMode, setDialogMode] = useState<"view" | "edit" | "create">("create")
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [agentToDelete, setAgentToDelete] = useState<Agent | null>(null)
 
   useEffect(() => {
     fetchAgents()
@@ -215,9 +227,16 @@ export default function AgentsPage() {
     }
   }
 
-  const handleDeleteAgent = async (agentId: number) => {
+  const handleDeleteClick = (agent: Agent) => {
+    setAgentToDelete(agent)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!agentToDelete) return
+
     try {
-      const response = await fetch(`/api/admin/agents/${agentId}`, {
+      const response = await fetch(`/api/admin/agents/${agentToDelete.id}`, {
         method: 'DELETE'
       })
 
@@ -231,6 +250,8 @@ export default function AgentsPage() {
         description: "تم حذف الوكيل بنجاح",
       })
 
+      setDeleteDialogOpen(false)
+      setAgentToDelete(null)
       fetchAgents() // Refresh the agents list
     } catch (error: any) {
       console.error('Error deleting agent:', error)
@@ -428,7 +449,7 @@ export default function AgentsPage() {
                       variant="outline" 
                       size="sm" 
                       className="text-red-600 hover:text-red-700 bg-transparent"
-                      onClick={() => handleDeleteAgent(agent.id)}
+                      onClick={() => handleDeleteClick(agent)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -545,6 +566,27 @@ export default function AgentsPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل أنت متأكد أنك تريد حذف الوكيل "{agentToDelete?.name}"؟ لا يمكن التراجع عن هذا الإجراء.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
