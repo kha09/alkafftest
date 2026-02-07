@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Save, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Loader2, Save, AlertCircle, CheckCircle2, Globe } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useToast } from '@/hooks/use-toast'
 import HeroSlidesEditor from './components/HeroSlidesEditor'
@@ -18,6 +19,7 @@ import HowItWorksEditor from './components/HowItWorksEditor'
 
 export default function ContentEditor() {
   const [content, setContent] = useState<HomePageContent | null>(null)
+  const [selectedLanguage, setSelectedLanguage] = useState<'ar' | 'en'>('ar')
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -27,10 +29,11 @@ export default function ContentEditor() {
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const response = await fetch('/api/homepage')
+        const response = await fetch(`/api/homepage?lang=${selectedLanguage}`)
         if (!response.ok) throw new Error('فشل في تحميل المحتوى')
         const data: HomePageContent = await response.json()
         setContent(data)
+        setHasUnsavedChanges(false)
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'حدث خطأ غير معروف')
       } finally {
@@ -38,7 +41,7 @@ export default function ContentEditor() {
       }
     }
     fetchContent()
-  }, [])
+  }, [selectedLanguage])
 
   const handleContentChange = (newContent: HomePageContent) => {
     setContent(newContent)
@@ -50,7 +53,7 @@ export default function ContentEditor() {
     
     setIsSaving(true)
     try {
-      const response = await fetch('/api/homepage', {
+      const response = await fetch(`/api/homepage?lang=${selectedLanguage}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +65,7 @@ export default function ContentEditor() {
       setHasUnsavedChanges(false)
       toast({
         title: "تم الحفظ بنجاح",
-        description: "تم حفظ جميع التغييرات على المحتوى",
+        description: `تم حفظ جميع التغييرات على المحتوى ${selectedLanguage === 'ar' ? 'العربي' : 'الإنجليزي'}`,
         duration: 3000,
       })
     } catch (err: unknown) {
@@ -126,6 +129,18 @@ export default function ContentEditor() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Globe className="h-4 w-4 text-muted-foreground" />
+            <Select value={selectedLanguage} onValueChange={(value: 'ar' | 'en') => setSelectedLanguage(value)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ar">العربية</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           {hasUnsavedChanges && (
             <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
               تغييرات غير محفوظة
