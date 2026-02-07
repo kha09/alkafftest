@@ -18,10 +18,12 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     const searchQuery = searchParams.get('search') || ''
     const departmentId = searchParams.get('department') || ''
     const duration = searchParams.get('duration') || ''
+    const language = searchParams.get('language') || 'ar'
 
     // Build the query conditions for departments and programs
     const departmentWhere: any = {
-      universityId: universityId
+      universityId: universityId,
+      language: language
     }
 
     // If department filter is applied, filter departments
@@ -30,7 +32,9 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     }
 
     // Build the query conditions for programs
-    const programWhere: any = {}
+    const programWhere: any = {
+      language: language
+    }
 
     // Add search condition
     if (searchQuery) {
@@ -45,8 +49,12 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       programWhere.duration = duration
     }
 
-    const university = await db.university.findUnique({
-      where: { id: universityId },
+    // Find the university with departments and programs in the requested language
+    const universityData = await db.university.findFirst({
+      where: { 
+        id: universityId,
+        language: language
+      },
       include: {
         departments: {
           where: departmentWhere,
@@ -59,11 +67,33 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       }
     })
 
-    if (!university) {
-      return NextResponse.json({ error: 'University not found' }, { status: 404 })
+    if (!universityData) {
+      // Fallback to Arabic if English not found
+      const fallbackUniversity = await db.university.findFirst({
+        where: { 
+          id: universityId,
+          language: 'ar'
+        },
+        include: {
+          departments: {
+            where: { ...departmentWhere, language: 'ar' },
+            include: {
+              programs: {
+                where: { ...programWhere, language: 'ar' }
+              }
+            }
+          }
+        }
+      })
+      
+      if (!fallbackUniversity) {
+        return NextResponse.json({ error: 'University not found' }, { status: 404 })
+      }
+      
+      return NextResponse.json(fallbackUniversity)
     }
 
-    return NextResponse.json(university)
+    return NextResponse.json(universityData)
   } catch (error) {
     console.error('Error fetching university details:', error)
     return NextResponse.json({ error: 'Failed to fetch university details' }, { status: 500 })

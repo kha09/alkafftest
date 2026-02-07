@@ -39,6 +39,7 @@ model University {
   order          Int    @default(0)
   freeOfferLetter Boolean @default(false)
   emailAddress   String? // University contact email for applications
+  language       String @default("ar") // "ar" for Arabic, "en" for English
   departments    Department[]
   sentEmails     SentEmail[]
 }
@@ -48,6 +49,7 @@ model Department {
   name       String
   university University @relation(fields: [universityId], references: [id])
   universityId Int
+  language   String @default("ar") // "ar" for Arabic, "en" for English
   programs   Program[]
 }
 
@@ -65,6 +67,7 @@ model Program {
   // Detailed fee structure for international students
   yearlyTuitionFees String   @default("") // JSON string for yearly fees
   otherFees         String   @default("") // JSON string for other fees
+  language          String   @default("ar") // "ar" for Arabic, "en" for English
   department        Department @relation(fields: [departmentId], references: [id])
   departmentId      Int
 }

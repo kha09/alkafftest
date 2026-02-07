@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import { University, Department } from "@/lib/types"
+import { useLanguage } from "@/contexts/LanguageContext"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -51,6 +52,7 @@ const sortOptions = [
 ]
 
 export default function UniversitiesPage() {
+  const { language } = useLanguage()
   const [universities, setUniversities] = useState<University[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -86,7 +88,8 @@ export default function UniversitiesPage() {
     const fetchUniversities = async (filters = {}) => {
       try {
         setLoading(true)
-        const queryParams = new URLSearchParams(filters as any).toString()
+        const filtersWithLanguage = { language, ...filters }
+        const queryParams = new URLSearchParams(filtersWithLanguage as any).toString()
         const url = `/api/universities${queryParams ? `?${queryParams}` : ''}`
         const response = await fetch(url)
         if (!response.ok) {
@@ -103,7 +106,7 @@ export default function UniversitiesPage() {
 
     fetchFilterOptions()
     fetchUniversities()
-  }, [])
+  }, [language])
 
   // Universities are now sorted by the backend API
   const sortedUniversities = universities
@@ -112,7 +115,7 @@ export default function UniversitiesPage() {
   const fetchUniversitiesWithFilters = async () => {
     try {
       setLoading(true)
-      const filters: any = {}
+      const filters: any = { language }
       
       if (searchQuery) filters.search = searchQuery
       if (selectedLevel && selectedLevel !== "all") filters.level = selectedLevel

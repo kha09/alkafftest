@@ -12,9 +12,12 @@ export async function GET(request: Request) {
     const offerLetterFee = searchParams.get('offerLetterFee') || 'all'
     const searchQuery = searchParams.get('search') || ''
     const sortBy = searchParams.get('sortBy') || 'popular'
+    const language = searchParams.get('language') || 'ar'
 
     // Build the query conditions
-    const whereConditions: any = {}
+    const whereConditions: any = {
+      language: language
+    }
 
     // Add search condition
     if (searchQuery && searchQuery !== '') {

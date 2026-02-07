@@ -2,13 +2,26 @@ import { NextResponse } from 'next/server'
 import db from '@/lib/db'
 import { Program } from '@/lib/types'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const language = searchParams.get('language') || 'ar'
+
     const programs = await db.program.findMany({
+      where: {
+        language: language
+      },
       include: {
         department: {
+          where: {
+            language: language
+          },
           include: {
-            university: true
+            university: {
+              where: {
+                language: language
+              }
+            }
           }
         }
       }

@@ -12,6 +12,10 @@ import { Switch } from '@/components/ui/switch'
 import { CountrySelect } from '@/components/ui/country-select'
 import { ColorPicker } from '@/components/ui/color-picker'
 import { EnhancedFileUpload } from '@/components/ui/enhanced-file-upload'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { Globe, Loader2 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 // Extended interface for university data that includes File objects
 interface UniversityFormData extends Omit<University, 'logo'> {
@@ -20,19 +24,21 @@ interface UniversityFormData extends Omit<University, 'logo'> {
 
 export default function UniversitiesManagement() {
   const [universities, setUniversities] = useState<University[]>([])
+  const [selectedLanguage, setSelectedLanguage] = useState<'ar' | 'en'>('ar')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentUniversity, setCurrentUniversity] = useState<UniversityFormData | null>(null)
+  const { toast } = useToast()
 
   useEffect(() => {
     fetchUniversities()
-  }, [])
+  }, [selectedLanguage])
 
   const fetchUniversities = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/universities')
+      const response = await fetch(`/api/universities?lang=${selectedLanguage}`)
       if (!response.ok) throw new Error('Failed to fetch universities')
       const data = await response.json()
       setUniversities(data)
@@ -93,7 +99,7 @@ export default function UniversitiesManagement() {
     
     try {
       const method = currentUniversity.id ? 'PUT' : 'POST'
-      const url = currentUniversity.id ? `/api/universities/${currentUniversity.id}` : '/api/universities'
+      const url = currentUniversity.id ? `/api/universities/${currentUniversity.id}?lang=${selectedLanguage}` : `/api/universities?lang=${selectedLanguage}`
       
       // Create FormData object
       const formData = new FormData()
@@ -119,8 +125,21 @@ export default function UniversitiesManagement() {
       // Close dialog and refresh the list
       setIsDialogOpen(false)
       fetchUniversities()
+      
+      toast({
+        title: "تم الحفظ بنجاح",
+        description: `تم ${currentUniversity.id ? 'تحديث' : 'إضافة'} الجامعة بنجاح`,
+        duration: 3000,
+      })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred')
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred'
+      setError(errorMessage)
+      toast({
+        title: "خطأ في الحفظ",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 5000,
+      })
     }
   }
 
@@ -149,8 +168,30 @@ export default function UniversitiesManagement() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">إدارة الجامعات</h1>
-        <Button onClick={handleCreate}>إضافة جامعة جديدة</Button>
+        <div>
+          <h1 className="text-2xl font-bold">إدارة الجامعات</h1>
+          <p className="text-muted-foreground mt-1">
+            إدارة وتحرير معلومات الجامعات المتاحة في المنصة
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Globe className="h-4 w-4 text-muted-foreground" />
+            <Select value={selectedLanguage} onValueChange={(value: 'ar' | 'en') => setSelectedLanguage(value)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ar">العربية</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Badge variant="outline" className="text-xs">
+            {universities.length} جامعة
+          </Badge>
+          <Button onClick={handleCreate}>إضافة جامعة جديدة</Button>
+        </div>
       </div>
 
       <Card>
