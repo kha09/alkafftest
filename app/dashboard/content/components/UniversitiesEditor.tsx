@@ -69,6 +69,8 @@ export default function UniversitiesEditor({ universities, onChange }: Universit
 
         const result = await response.json()
         console.log('Upload successful:', result)
+        
+        // Store the S3 file path for serving through the API
         updateUniversity(index, 'logo', result.filePath)
       } catch (error) {
         console.error('Error uploading logo:', error)
