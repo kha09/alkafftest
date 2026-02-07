@@ -118,3 +118,65 @@ export async function PUT(request: NextRequest) {
     )
   }
 }
+
+// DELETE /api/admin/form-submissions/:id - Delete a form submission
+export async function DELETE(request: NextRequest) {
+  try {
+    // Check if user is admin (would need to implement auth)
+    // const session = await getServerSession(authOptions)
+    // if (!session || session.user.role !== 'admin') {
+    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // }
+
+    const id = parseInt(request.nextUrl.pathname.split('/').pop() || '')
+    
+    if (isNaN(id)) {
+      return NextResponse.json({ error: 'Invalid ID' }, { status: 400 })
+    }
+
+    // Check if the form submission exists
+    const existingSubmission = await prisma.formSubmission.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        uploadedFiles: true
+      }
+    })
+
+    if (!existingSubmission) {
+      return NextResponse.json({ error: 'الطلب غير موجود' }, { status: 404 })
+    }
+
+    // Delete related records first (due to foreign key constraints)
+    
+    // Delete related orders
+    await prisma.order.deleteMany({
+      where: { formSubmissionId: id }
+    })
+
+    // Delete related uploaded files
+    await prisma.uploadedFile.deleteMany({
+      where: { formSubmissionId: id }
+    })
+
+    // Delete related user if exists
+    if (existingSubmission.user) {
+      await prisma.user.delete({
+        where: { id: existingSubmission.user.id }
+      })
+    }
+
+    // Finally delete the form submission
+    await prisma.formSubmission.delete({
+      where: { id }
+    })
+
+    return NextResponse.json({ message: 'تم حذف الطلب بنجاح' })
+  } catch (error) {
+    console.error('Error deleting form submission:', error)
+    return NextResponse.json(
+      { error: 'حدث خطأ أثناء حذف الطلب' },
+      { status: 500 }
+    )
+  }
+}

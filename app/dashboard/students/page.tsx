@@ -11,6 +11,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { ApplicationForm } from "@/components/application-form"
 import { PaymentReceiptSection } from "@/components/payment-receipt-section"
 import { VisaDocumentsSection } from "@/components/visa-documents-section"
@@ -106,6 +116,8 @@ export default function StudentsPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [totalSubmissions, setTotalSubmissions] = useState(0)
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [submissionToDelete, setSubmissionToDelete] = useState<FormSubmission | null>(null)
 
   useEffect(() => {
     fetchAgents()
@@ -438,6 +450,39 @@ export default function StudentsPage() {
     setIsEmailDialogOpen(true)
   }
 
+  const handleConfirmDelete = async () => {
+    if (!submissionToDelete) return
+
+    try {
+      const response = await fetch(`/api/admin/form-submissions/${submissionToDelete.id}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        // Remove the deleted submission from the list
+        setSubmissions(submissions.filter(sub => sub.id !== submissionToDelete.id))
+        setDeleteDialogOpen(false)
+        setSubmissionToDelete(null)
+        toast({
+          title: "نجاح",
+          description: "تم حذف الطلب بنجاح",
+        })
+        // Refresh the list to get updated pagination
+        fetchSubmissions(currentPage, searchTerm, selectedAgent, selectedOrderStage)
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to delete submission')
+      }
+    } catch (error: any) {
+      console.error('Error deleting submission:', error)
+      toast({
+        title: "خطأ",
+        description: error.message || "حدث خطأ أثناء حذف الطلب",
+        variant: "destructive",
+      })
+    }
+  }
+
   if (loading) {
     return (
       <div className="p-6 space-y-6">
@@ -704,6 +749,17 @@ export default function StudentsPage() {
                               </Button>
                             </>
                           )}
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              setSubmissionToDelete(submission)
+                              setDeleteDialogOpen(true)
+                            }}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button variant="outline" size="sm">
@@ -1123,6 +1179,27 @@ export default function StudentsPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل أنت متأكد أنك تريد حذف الطلب للطالب "{submissionToDelete?.fullName}"؟ لا يمكن التراجع عن هذا الإجراء.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
