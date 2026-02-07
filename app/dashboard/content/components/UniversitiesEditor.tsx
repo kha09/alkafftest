@@ -53,8 +53,8 @@ export default function UniversitiesEditor({ universities, onChange }: Universit
         // Create FormData for the API request
         const formData = new FormData()
         formData.append('file', file)
-        formData.append('category', 'homepage/universities')
-        formData.append('identifier', `university-${index}`)
+        formData.append('category', 'university-logos')
+        formData.append('identifier', `homepage-university-${index}-${Date.now()}`)
 
         // Upload the file using the API endpoint
         const response = await fetch('/api/upload', {
@@ -63,16 +63,16 @@ export default function UniversitiesEditor({ universities, onChange }: Universit
         })
 
         if (!response.ok) {
-          throw new Error('Upload failed')
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Upload failed')
         }
 
         const result = await response.json()
+        console.log('Upload successful:', result)
         updateUniversity(index, 'logo', result.filePath)
       } catch (error) {
         console.error('Error uploading logo:', error)
-        // Fallback to creating a local URL for preview
-        const url = URL.createObjectURL(file)
-        updateUniversity(index, 'logo', url)
+        alert(`فشل في رفع الشعار: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`)
       }
     } else {
       updateUniversity(index, 'logo', '')
@@ -227,17 +227,20 @@ export default function UniversitiesEditor({ universities, onChange }: Universit
                     <ColorPicker
                       label=""
                       value={university.color}
-                      onChange={(color) => updateUniversity(index, 'color', color)}
+                      onChange={(color) => {
+                        // Ensure we always store a gradient string for consistency with homepage
+                        const gradientColor = color.startsWith('linear-gradient') 
+                          ? color 
+                          : `linear-gradient(135deg, ${color} 0%, ${color} 100%)`;
+                        updateUniversity(index, 'color', gradientColor);
+                      }}
                       placeholder="اختر لون أو تدرج"
                     />
                     <div className="mt-2">
                       <Label className="text-xs text-muted-foreground">معاينة اللون:</Label>
                       <div 
                         className="w-full h-8 rounded-md mt-1 border"
-                        style={university.color.startsWith('linear-gradient') 
-                          ? { background: university.color }
-                          : { backgroundColor: university.color }
-                        }
+                        style={{ background: university.color }}
                       />
                     </div>
                   </div>
