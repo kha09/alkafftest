@@ -12,6 +12,7 @@ import { CountrySelect } from '@/components/ui/country-select'
 import { ColorPicker } from '@/components/ui/color-picker'
 import { Plus, Trash2, GraduationCap, AlertCircle, Building2, Users, BookOpen, TrendingUp, Award } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { saveFile } from '@/lib/fileStorage'
 
 interface UniversitiesEditorProps {
   universities: University[]
@@ -47,12 +48,18 @@ export default function UniversitiesEditor({ universities, onChange }: Universit
     onChange(updatedUniversities)
   }
 
-  const handleLogoUpload = (index: number, file: File | null) => {
+  const handleLogoUpload = async (index: number, file: File | null) => {
     if (file) {
-      // For now, we'll create a URL for the file
-      // In a real implementation, you'd upload to your storage service
-      const url = URL.createObjectURL(file)
-      updateUniversity(index, 'logo', url)
+      try {
+        // Upload the file to the storage service
+        const result = await saveFile(file, 'homepage/universities', `university-${index}`)
+        updateUniversity(index, 'logo', result.relativePath)
+      } catch (error) {
+        console.error('Error uploading logo:', error)
+        // Fallback to creating a local URL for preview
+        const url = URL.createObjectURL(file)
+        updateUniversity(index, 'logo', url)
+      }
     } else {
       updateUniversity(index, 'logo', '')
     }

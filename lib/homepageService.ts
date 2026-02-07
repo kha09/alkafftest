@@ -6,7 +6,7 @@ export async function getHomepageContent(): Promise<HomePageContent> {
     // Fetch all content types from the database
     const [heroSlides, universities, testimonials, faqs, whySMAlkaff, howItWorks] = await Promise.all([
       db.heroSlide.findMany({ orderBy: { order: 'asc' } }),
-      db.university.findMany({ orderBy: { order: 'asc' } }),
+      db.homePageUniversity.findMany({ orderBy: { order: 'asc' } }),
       db.testimonial.findMany({ orderBy: { order: 'asc' } }),
       db.faq.findMany({ orderBy: { order: 'asc' } }),
       db.whySMAlkaff.findMany(),
@@ -142,53 +142,26 @@ export async function updateHomepageContent(content: HomePageContent): Promise<v
         }
       }
 
-      // For universities, we need to be more careful due to foreign key constraints
-      // with departments and programs. Instead of deleting all universities, we'll
-      // update existing ones and create new ones as needed.
+      // Handle homepage universities - these are completely separate from the main university database
+      // Delete all existing homepage universities and recreate them
+      await prisma.homePageUniversity.deleteMany()
       
-      // Get existing universities
-      const existingUniversities = await prisma.university.findMany()
-      
-      // Update or create universities
-      for (let i = 0; i < content.universities.length; i++) {
-        const universityData = {
-          name: content.universities[i].name,
-          country: content.universities[i].country,
-          logo: content.universities[i].logo,
-          ranking: content.universities[i].ranking,
-          students: content.universities[i].students,
-          programs: content.universities[i].programs,
-          acceptance: content.universities[i].acceptance,
-          color: content.universities[i].color,
-          flag: content.universities[i].flag,
-          freeOfferLetter: content.universities[i].freeOfferLetter,
-          order: i,
-        }
-        
-        if (i < existingUniversities.length) {
-          // Update existing university
-          await prisma.university.update({
-            where: { id: existingUniversities[i].id },
-            data: universityData,
-          })
-        } else {
-          // Create new university
-          await prisma.university.create({
-            data: universityData,
-          })
-        }
-      }
-      
-      // If there are more existing universities than in the new content, delete the extras
-      if (content.universities.length < existingUniversities.length) {
-        const idsToDelete = existingUniversities
-          .slice(content.universities.length)
-          .map(u => u.id)
-        
-        // Before deleting universities, we need to delete their departments and programs
-        // This is a complex operation that requires careful handling
-        // For now, we'll skip this part as it's not part of the homepage content
-      }
+      // Create new homepage universities
+      await prisma.homePageUniversity.createMany({
+        data: content.universities.map((university, index) => ({
+          name: university.name,
+          country: university.country,
+          logo: university.logo,
+          ranking: university.ranking,
+          students: university.students,
+          programs: university.programs,
+          acceptance: university.acceptance,
+          color: university.color,
+          flag: university.flag,
+          freeOfferLetter: university.freeOfferLetter,
+          order: index,
+        })),
+      })
 
       // Create new hero slides
       await prisma.heroSlide.createMany({

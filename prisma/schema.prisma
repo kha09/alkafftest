@@ -108,6 +108,21 @@ model HowItWorks {
   steps       String   // JSON string for steps array
 }
 
+model HomePageUniversity {
+  id             Int    @id @default(autoincrement())
+  name           String
+  country        String
+  logo           String
+  ranking        String
+  students       String
+  programs       String
+  acceptance     String
+  color          String
+  flag           String
+  order          Int    @default(0)
+  freeOfferLetter Boolean @default(false)
+}
+
 model FormSubmission {
   id                Int           @id @default(autoincrement())
   fullName          String
