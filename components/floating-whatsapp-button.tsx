@@ -84,7 +84,7 @@ export default function FloatingWhatsAppButton() {
       </div>
 
       {/* Pulse animation */}
-      <div className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-20"></div>
+      <div className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-20 pointer-events-none"></div>
     </div>
   )
 }
