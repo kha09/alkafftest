@@ -141,11 +141,11 @@ export default function LandingPage() {
   ) || []
 
   const faqCategories = [
-    { id: "all", name: "جميع الأسئلة" },
-    { id: "application", name: "التقديم" },
-    { id: "payment", name: "الدفع" },
-    { id: "universities", name: "الجامعات" },
-    { id: "agents", name: "الوكلاء" },
+    { id: "all", name: t('faq.category.all') },
+    { id: "application", name: t('faq.category.application') },
+    { id: "payment", name: t('faq.category.payment') },
+    { id: "universities", name: t('faq.category.universities') },
+    { id: "agents", name: t('faq.category.agents') },
   ]
 
   useEffect(() => {
@@ -286,26 +286,26 @@ export default function LandingPage() {
 
             <nav className="hidden md:flex items-center space-x-8 space-x-reverse" dir="rtl">
               <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
-                الرئيسية
+                {t('nav.home')}
               </Link>
               <Link href="/universities" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
-                التخصصات والجامعات
+                {t('nav.universities')}
               </Link>
               <Link href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
-                من نحن
+                {t('nav.about')}
               </Link>
               <Link href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
-                تواصل معنا
+                {t('nav.contact')}
               </Link>
             </nav>
 
             <div className="flex items-center space-x-4" dir="rtl">
               <LanguageSwitcher />
               <Button variant="outline" className="hidden md:inline-flex">
-                تسجيل الدخول
+                {t('nav.login')}
               </Button>
               <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                ابدأ الآن
+                {t('nav.start')}
               </Button>
             </div>
           </div>
@@ -352,7 +352,7 @@ export default function LandingPage() {
                         className="bg-white text-blue-600 hover:bg-gray-100 transform hover:scale-105 transition-all duration-200"
                       >
                         <GraduationCap className="mr-2 h-5 w-5" />
-                        تصفّح التخصصات
+                        {t('hero.browse')}
                       </Button>
                       <Button
                         size="lg"
@@ -360,7 +360,7 @@ export default function LandingPage() {
                         onClick={() => setShowApplicationForm(true)}
                       >
                         <FileText className="mr-2 h-5 w-5" />
-                        قدّم الآن
+                        {t('hero.apply')}
                       </Button>
                     </div>
                   </div>
@@ -405,43 +405,43 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="bg-gradient-to-r from-slate-800/95 to-slate-900/95 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/10">
             <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">ابحث عن التخصص الذي ترغب فيه</h2>
-              <p className="text-slate-300">اكتشف أفضل الجامعات والتخصصات المناسبة لك</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">{t('search.title')}</h2>
+              <p className="text-slate-300">{t('search.description')}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
               {/* Search Button - Now first (leftmost) */}
               <div className="space-y-2 md:order-1">
-                <label className="text-sm font-medium text-transparent block">البحث</label>
+                <label className="text-sm font-medium text-transparent block">{t('common.search')}</label>
                 <Button
                   size="lg"
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 py-3"
                 >
                   <Search className="mr-2 h-5 w-5" />
-                  ابحث
+                  {t('search.button')}
                 </Button>
               </div>
 
               {/* Degree Level Dropdown - Now second */}
               <div className="space-y-2 md:order-2">
-                <label className="text-sm font-medium text-slate-300 block text-right">الدرجة العلمية</label>
+                <label className="text-sm font-medium text-slate-300 block text-right">{t('search.degree')}</label>
                 <div className="relative">
                   <GraduationCap className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none z-10" />
                   <select className="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer hover:bg-white/15 transition-all duration-200 pl-10">
                     <option value="" className="bg-slate-800 text-white">
-                      اختر الدرجة التي ترغب فيه
+                      {t('search.degree.placeholder')}
                     </option>
                     <option value="bachelor" className="bg-slate-800 text-white">
-                      البكالوريوس
+                      {t('search.degree.bachelor')}
                     </option>
                     <option value="master" className="bg-slate-800 text-white">
-                      الماجستير
+                      {t('search.degree.master')}
                     </option>
                     <option value="phd" className="bg-slate-800 text-white">
-                      الدكتوراه
+                      {t('search.degree.phd')}
                     </option>
                     <option value="diploma" className="bg-slate-800 text-white">
-                      الدبلوم
+                      {t('search.degree.diploma')}
                     </option>
                   </select>
                 </div>
@@ -449,30 +449,30 @@ export default function LandingPage() {
 
               {/* Country Dropdown - Now third */}
               <div className="space-y-2 md:order-3">
-                <label className="text-sm font-medium text-slate-300 block text-right">البلد</label>
+                <label className="text-sm font-medium text-slate-300 block text-right">{t('search.country')}</label>
                 <div className="relative">
                   <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none z-10" />
                   <select className="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer hover:bg-white/15 transition-all duration-200 pl-10">
                     <option value="" className="bg-slate-800 text-white">
-                      اختر البلد الدراسية التي تريدها
+                      {t('search.country.placeholder')}
                     </option>
                     <option value="usa" className="bg-slate-800 text-white">
-                      الولايات المتحدة
+                      {t('search.country.usa')}
                     </option>
                     <option value="uk" className="bg-slate-800 text-white">
-                      المملكة المتحدة
+                      {t('search.country.uk')}
                     </option>
                     <option value="canada" className="bg-slate-800 text-white">
-                      كندا
+                      {t('search.country.canada')}
                     </option>
                     <option value="australia" className="bg-slate-800 text-white">
-                      أستراليا
+                      {t('search.country.australia')}
                     </option>
                     <option value="germany" className="bg-slate-800 text-white">
-                      ألمانيا
+                      {t('search.country.germany')}
                     </option>
                     <option value="france" className="bg-slate-800 text-white">
-                      فرنسا
+                      {t('search.country.france')}
                     </option>
                   </select>
                 </div>
@@ -480,30 +480,30 @@ export default function LandingPage() {
 
               {/* Specialization Dropdown - Now fourth (rightmost) */}
               <div className="space-y-2 md:order-4">
-                <label className="text-sm font-medium text-slate-300 block text-right">التخصص</label>
+                <label className="text-sm font-medium text-slate-300 block text-right">{t('search.specialization')}</label>
                 <div className="relative">
                   <ChevronDown className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none z-10" />
                   <select className="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer hover:bg-white/15 transition-all duration-200 pl-10">
                     <option value="" className="bg-slate-800 text-white">
-                      اختر التخصص الذي ترغب فيه
+                      {t('search.specialization.placeholder')}
                     </option>
                     <option value="engineering" className="bg-slate-800 text-white">
-                      الهندسة
+                      {t('search.specialization.engineering')}
                     </option>
                     <option value="medicine" className="bg-slate-800 text-white">
-                      الطب
+                      {t('search.specialization.medicine')}
                     </option>
                     <option value="business" className="bg-slate-800 text-white">
-                      إدارة الأعمال
+                      {t('search.specialization.business')}
                     </option>
                     <option value="computer-science" className="bg-slate-800 text-white">
-                      علوم الحاسوب
+                      {t('search.specialization.computer')}
                     </option>
                     <option value="law" className="bg-slate-800 text-white">
-                      القانون
+                      {t('search.specialization.law')}
                     </option>
                     <option value="arts" className="bg-slate-800 text-white">
-                      الفنون
+                      {t('search.specialization.arts')}
                     </option>
                   </select>
                 </div>
@@ -511,14 +511,14 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-8 pt-6 border-t border-white/10">
-              <p className="text-sm text-slate-400 mb-3 text-right">البحث السريع:</p>
+              <p className="text-sm text-slate-400 mb-3 text-right">{t('search.quick')}</p>
               <div className="flex flex-wrap gap-2 justify-end">
                 {[
-                  "الطب في أمريكا",
-                  "الهندسة في كندا",
-                  "إدارة الأعمال في بريطانيا",
-                  "علوم الحاسوب في أستراليا",
-                  "الماجستير في ألمانيا",
+                  t('search.tag.medicine.usa'),
+                  t('search.tag.engineering.canada'),
+                  t('search.tag.business.uk'),
+                  t('search.tag.computer.australia'),
+                  t('search.tag.master.germany'),
                 ].map((tag, index) => (
                   <button
                     key={index}
@@ -562,13 +562,13 @@ export default function LandingPage() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in-up">
               <Crown className="h-4 w-4" />
-              <span>شراكات عالمية مميزة</span>
+              <span>{t('universities.badge')}</span>
             </div>
             <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              شراكات مع أفضل الجامعات العالمية
+              {t('universities.title')}
             </h2>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              أكثر من 500 جامعة حول العالم في انتظارك - من أعرق المؤسسات التعليمية إلى أحدث الجامعات التقنية
+              {t('universities.description')}
             </p>
           </div>
 
@@ -589,48 +589,48 @@ export default function LandingPage() {
                         {/* University Info */}
                         <div className="text-center lg:text-right">
                           <div className="flex items-center justify-center lg:justify-end space-x-4 mb-6">
-                            <div className="text-4xl">{content.universities[currentUniversity].flag}</div>
+                            <div className="text-4xl">{content.universities?.[currentUniversity]?.flag || '🏛️'}</div>
                             <div
-                              className={`bg-gradient-to-r ${content.universities[currentUniversity].color} text-white px-4 py-2 rounded-full text-sm font-bold flex items-center space-x-2`}
+                              className={`bg-gradient-to-r ${content.universities?.[currentUniversity]?.color || 'from-blue-500 to-purple-500'} text-white px-4 py-2 rounded-full text-sm font-bold flex items-center space-x-2`}
                             >
                               <Award className="h-4 w-4" />
-                              <span>ترتيب {content.universities[currentUniversity].ranking} عالمياً</span>
+                              <span>{content.universities?.[currentUniversity]?.ranking ? t('universities.ranking', content.universities[currentUniversity].ranking).replace('{ranking}', content.universities[currentUniversity].ranking) : 'Top Ranked'}</span>
                             </div>
                           </div>
 
                           <h3 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text transition-all duration-300">
-                            {content.universities[currentUniversity].name}
+                            {content.universities?.[currentUniversity]?.name || 'Loading...'}
                           </h3>
 
                           <div className="flex items-center justify-center lg:justify-end space-x-2 mb-6">
                             <MapPin className="h-5 w-5 text-gray-500" />
-                            <span className="text-xl text-gray-600">{content.universities[currentUniversity].country}</span>
+                            <span className="text-xl text-gray-600">{content.universities?.[currentUniversity]?.country || 'Loading...'}</span>
                           </div>
 
                           {/* Statistics Grid */}
                           <div className="grid grid-cols-2 gap-6 mb-8">
                             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:scale-105 transition-transform duration-300">
                               <div className="text-3xl font-bold text-gray-900 mb-2">
-                                {content.universities[currentUniversity].students}
+                                {content.universities?.[currentUniversity]?.students || '0'}
                               </div>
-                              <div className="text-gray-600 text-sm">طالب مسجل</div>
+                              <div className="text-gray-600 text-sm">{t('universities.students')}</div>
                             </div>
                             <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:scale-105 transition-transform duration-300">
                               <div className="text-3xl font-bold text-gray-900 mb-2">
-                                {content.universities[currentUniversity].programs}
+                                {content.universities?.[currentUniversity]?.programs || '0'}
                               </div>
-                              <div className="text-gray-600 text-sm">برنامج دراسي</div>
+                              <div className="text-gray-600 text-sm">{t('universities.programs')}</div>
                             </div>
                           </div>
 
                           <div className="flex items-center justify-center lg:justify-end space-x-4">
                             <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
-                              معدل القبول: {content.universities[currentUniversity].acceptance}
+                              {content.universities?.[currentUniversity]?.acceptance ? t('universities.acceptance', content.universities[currentUniversity].acceptance).replace('{acceptance}', content.universities[currentUniversity].acceptance) : '95% Acceptance'}
                             </div>
                             <Button
-                              className={`bg-gradient-to-r ${content.universities[currentUniversity].color} hover:scale-105 transition-all duration-200 text-white border-0`}
+                              className={`bg-gradient-to-r ${content.universities?.[currentUniversity]?.color || 'from-blue-500 to-purple-500'} hover:scale-105 transition-all duration-200 text-white border-0`}
                             >
-                              استكشف البرامج
+                              {t('universities.explore')}
                             </Button>
                           </div>
                         </div>
@@ -640,37 +640,37 @@ export default function LandingPage() {
                           <div className="relative group-hover:scale-105 transition-transform duration-500">
                             {/* Glow Effect */}
                             <div
-                              className={`absolute inset-0 bg-gradient-to-r ${content.universities[currentUniversity].color} opacity-20 blur-3xl rounded-full scale-150 group-hover:opacity-40 transition-opacity duration-500`}
+                              className={`absolute inset-0 bg-gradient-to-r ${content.universities?.[currentUniversity]?.color || 'from-blue-500 to-purple-500'} opacity-20 blur-3xl rounded-full scale-150 group-hover:opacity-40 transition-opacity duration-500`}
                             ></div>
 
                             {/* Logo Container */}
                             <div className="relative bg-white rounded-3xl p-12 shadow-2xl border border-white/20">
                               <Image
-                                src={content.universities[currentUniversity].logo || "/placeholder.svg"}
-                                alt={content.universities[currentUniversity].name}
+                                src={content.universities?.[currentUniversity]?.logo || "/placeholder.svg"}
+                                alt={content.universities?.[currentUniversity]?.name || 'University'}
                                 width={200}
                                 height={200}
                                 className="mx-auto rounded-2xl group-hover:scale-110 transition-transform duration-500"
                               />
                             </div>
 
-                            {/* Floating Stats */}
-                            <div className="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-lg border border-gray-100 animate-float">
-                              <div className="flex items-center space-x-2">
-                                <TrendingUp className="h-5 w-5 text-green-500" />
-                                <span className="text-sm font-bold text-gray-900">متاح للتقديم</span>
-                              </div>
-                            </div>
+                    {/* Floating Stats */}
+                    <div className="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-lg border border-gray-100 animate-float">
+                      <div className="flex items-center space-x-2">
+                        <TrendingUp className="h-5 w-5 text-green-500" />
+                        <span className="text-sm font-bold text-gray-900">{t('homepage.available')}</span>
+                      </div>
+                    </div>
 
-                            <div
-                              className="absolute -bottom-4 -left-4 bg-white rounded-2xl p-4 shadow-lg border border-gray-100 animate-float"
-                              style={{ animationDelay: "1s" }}
-                            >
-                              <div className="flex items-center space-x-2">
-                                <Star className="h-5 w-5 text-yellow-500" />
-                                <span className="text-sm font-bold text-gray-900">تقييم 4.9/5</span>
-                              </div>
-                            </div>
+                    <div
+                      className="absolute -bottom-4 -left-4 bg-white rounded-2xl p-4 shadow-lg border border-gray-100 animate-float"
+                      style={{ animationDelay: "1s" }}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <Star className="h-5 w-5 text-yellow-500" />
+                        <span className="text-sm font-bold text-gray-900">{t('homepage.rating')}</span>
+                      </div>
+                    </div>
                           </div>
                         </div>
                       </div>
@@ -759,10 +759,10 @@ export default function LandingPage() {
             {/* Partnership Stats */}
             <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
               {[
-                { number: "500+", label: "جامعة شريكة", icon: Globe, color: "from-blue-500 to-cyan-500" },
-                { number: "50+", label: "دولة متاحة", icon: MapPin, color: "from-green-500 to-emerald-500" },
-                { number: "1000+", label: "برنامج دراسي", icon: BookOpen, color: "from-purple-500 to-pink-500" },
-                { number: "95%", label: "معدل القبول", icon: Award, color: "from-orange-500 to-red-500" },
+                { number: "500+", label: t('universities.stats.partners'), icon: Globe, color: "from-blue-500 to-cyan-500" },
+                { number: "50+", label: t('universities.stats.countries'), icon: MapPin, color: "from-green-500 to-emerald-500" },
+                { number: "1000+", label: t('universities.stats.programs'), icon: BookOpen, color: "from-purple-500 to-pink-500" },
+                { number: "95%", label: t('universities.stats.acceptance'), icon: Award, color: "from-orange-500 to-red-500" },
               ].map((stat, index) => (
                 <div
                   key={index}
@@ -788,9 +788,9 @@ export default function LandingPage() {
           {/* Call to Action */}
           <div className="text-center mt-16">
             <div className="inline-flex items-center space-x-4 bg-white/80 backdrop-blur-lg rounded-full px-8 py-4 border border-white/20 hover:border-white/40 transition-all duration-300 hover:scale-105 shadow-lg">
-              <span className="text-gray-700 font-medium">اكتشف جميع الجامعات الشريكة</span>
+              <span className="text-gray-700 font-medium">{t('homepage.discover.all')}</span>
               <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 rounded-full px-6 py-2 transform hover:scale-105 transition-all duration-200">
-                تصفح الجامعات
+                {t('homepage.browse.universities')}
               </Button>
             </div>
           </div>
@@ -2092,63 +2092,63 @@ export default function LandingPage() {
                 <GraduationCap className="h-8 w-8 text-blue-400" />
                 <span className="text-2xl font-bold">SM Alkaff</span>
               </div>
-              <p className="text-gray-400 leading-relaxed">منصة ذكية تربطك بأفضل الجامعات والتخصصات حول العالم</p>
+              <p className="text-gray-400 leading-relaxed">{t('footer.description')}</p>
             </div>
 
             <div>
-              <h4 className="text-lg font-semibold mb-6">روابط سريعة</h4>
+              <h4 className="text-lg font-semibold mb-6">{t('footer.quick.links')}</h4>
               <ul className="space-y-3">
                 <li>
                   <Link href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
-                    الرئيسية
+                    {t('nav.home')}
                   </Link>
                 </li>
                 <li>
                   <Link href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
-                    التخصصات
+                    {t('nav.universities')}
                   </Link>
                 </li>
                 <li>
                   <Link href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
-                    الجامعات
+                    {t('nav.universities')}
                   </Link>
                 </li>
                 <li>
                   <Link href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
-                    من نحن
+                    {t('nav.about')}
                   </Link>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-lg font-semibold mb-6">الدعم</h4>
+              <h4 className="text-lg font-semibold mb-6">{t('footer.support')}</h4>
               <ul className="space-y-3">
                 <li>
                   <Link href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
-                    مركز المساعدة
+                    {t('footer.help.center')}
                   </Link>
                 </li>
                 <li>
                   <Link href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
-                    سياسة الخصوصية
+                    {t('footer.privacy')}
                   </Link>
                 </li>
                 <li>
                   <Link href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
-                    شروط الاستخدام
+                    {t('footer.terms')}
                   </Link>
                 </li>
                 <li>
                   <Link href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
-                    تواصل معنا
+                    {t('footer.contact')}
                   </Link>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-lg font-semibold mb-6">تواصل معنا</h4>
+              <h4 className="text-lg font-semibold mb-6">{t('footer.contact')}</h4>
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <Phone className="h-5 w-5 text-blue-400" />
@@ -2183,7 +2183,7 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t border-gray-800 pt-8 text-center">
-            <p className="text-gray-400">جميع الحقوق محفوظة © 2025 SM Alkaff</p>
+            <p className="text-gray-400">{t('footer.copyright')}</p>
           </div>
         </div>
       </footer>
