@@ -1,0 +1,263 @@
+{
+  "heroSlides": [
+    {
+      "title": "Your Gateway to Global Education",
+      "subtitle": "Study Abroad with SM Alkaff",
+      "description": "Discover world-class universities and programs tailored to your academic goals. Start your international education journey today.",
+      "image": "/images/hero-1.jpg",
+      "gradient": "from-blue-600 to-purple-600",
+      "order": 1,
+      "language": "en"
+    },
+    {
+      "title": "Excellence in Educational Consulting",
+      "subtitle": "Your Success is Our Mission",
+      "description": "With years of experience, we guide students to the best universities worldwide. Join thousands of successful graduates.",
+      "image": "/images/hero-2.jpg",
+      "gradient": "from-green-600 to-blue-600",
+      "order": 2,
+      "language": "en"
+    },
+    {
+      "title": "Unlock Your Potential",
+      "subtitle": "Study at Top Universities",
+      "description": "Access premium education opportunities at renowned institutions. We make your dreams of studying abroad a reality.",
+      "image": "/images/hero-3.jpg",
+      "gradient": "from-purple-600 to-pink-600",
+      "order": 3,
+      "language": "en"
+    }
+  ],
+  "universities": [
+    {
+      "name": "University of Technology Sydney",
+      "country": "Australia",
+      "logo": "/images/universities/uts-logo.png",
+      "ranking": "#1",
+      "students": "45,000+",
+      "programs": "200+",
+      "acceptance": "85%",
+      "color": "#FF6B35",
+      "flag": "🇦🇺",
+      "order": 1,
+      "freeOfferLetter": true,
+      "language": "en"
+    },
+    {
+      "name": "University of Toronto",
+      "country": "Canada",
+      "logo": "/images/universities/uoft-logo.png",
+      "ranking": "#2",
+      "students": "97,000+",
+      "programs": "300+",
+      "acceptance": "43%",
+      "color": "#002A5C",
+      "flag": "🇨🇦",
+      "order": 2,
+      "freeOfferLetter": true,
+      "language": "en"
+    },
+    {
+      "name": "King's College London",
+      "country": "United Kingdom",
+      "logo": "/images/universities/kcl-logo.png",
+      "ranking": "#3",
+      "students": "31,000+",
+      "programs": "180+",
+      "acceptance": "13%",
+      "color": "#8B0000",
+      "flag": "🇬🇧",
+      "order": 3,
+      "freeOfferLetter": false,
+      "language": "en"
+    },
+    {
+      "name": "National University of Singapore",
+      "country": "Singapore",
+      "logo": "/images/universities/nus-logo.png",
+      "ranking": "#4",
+      "students": "38,000+",
+      "programs": "150+",
+      "acceptance": "5%",
+      "color": "#003D7A",
+      "flag": "🇸🇬",
+      "order": 4,
+      "freeOfferLetter": true,
+      "language": "en"
+    }
+  ],
+  "testimonials": [
+    {
+      "name": "Sarah Johnson",
+      "program": "Computer Science",
+      "text": "SM Alkaff made my dream of studying in Australia come true. Their guidance throughout the application process was exceptional.",
+      "rating": 5,
+      "avatar": "/images/testimonials/sarah.jpg",
+      "university": "University of Technology Sydney",
+      "country": "Australia",
+      "flag": "🇦🇺",
+      "date": "2024",
+      "hasVideo": false,
+      "featured": true,
+      "category": "student",
+      "order": 1,
+      "language": "en"
+    },
+    {
+      "name": "Ahmed Al-Rashid",
+      "program": "Business Administration",
+      "text": "The team at SM Alkaff provided excellent support. I'm now studying at one of Canada's top universities thanks to their expertise.",
+      "rating": 5,
+      "avatar": "/images/testimonials/ahmed.jpg",
+      "university": "University of Toronto",
+      "country": "Canada",
+      "flag": "🇨🇦",
+      "date": "2024",
+      "hasVideo": true,
+      "featured": true,
+      "category": "student",
+      "order": 2,
+      "language": "en"
+    },
+    {
+      "name": "Emily Chen",
+      "program": "Medicine",
+      "text": "Professional service and comprehensive support. SM Alkaff helped me secure admission to my dream medical program in the UK.",
+      "rating": 5,
+      "avatar": "/images/testimonials/emily.jpg",
+      "university": "King's College London",
+      "country": "United Kingdom",
+      "flag": "🇬🇧",
+      "date": "2023",
+      "hasVideo": false,
+      "featured": true,
+      "category": "student",
+      "order": 3,
+      "language": "en"
+    }
+  ],
+  "faqs": [
+    {
+      "question": "How do I apply for university admission?",
+      "answer": "Our team will guide you through the entire application process, from selecting the right university to submitting your documents and preparing for interviews.",
+      "category": "application",
+      "popular": true,
+      "order": 1,
+      "language": "en"
+    },
+    {
+      "question": "What are the admission requirements?",
+      "answer": "Requirements vary by university and program. Generally, you'll need academic transcripts, English proficiency test scores, and supporting documents. We'll help you understand specific requirements.",
+      "category": "requirements",
+      "popular": true,
+      "order": 2,
+      "language": "en"
+    },
+    {
+      "question": "How long does the application process take?",
+      "answer": "The process typically takes 2-6 months depending on the university and program. We recommend starting early to ensure the best chances of acceptance.",
+      "category": "timeline",
+      "popular": true,
+      "order": 3,
+      "language": "en"
+    },
+    {
+      "question": "Do you provide visa assistance?",
+      "answer": "Yes, we provide comprehensive visa guidance and support throughout the visa application process to ensure a smooth transition to your chosen destination.",
+      "category": "visa",
+      "popular": true,
+      "order": 4,
+      "language": "en"
+    }
+  ],
+  "whySMAlkaff": {
+    "title": "Why Choose SM Alkaff?",
+    "description": "We are your trusted partner in achieving your educational dreams abroad",
+    "language": "en",
+    "features": [
+      {
+        "icon": "GraduationCap",
+        "title": "Expert Guidance",
+        "subtitle": "Professional Counseling",
+        "description": "Our experienced counselors provide personalized guidance to help you choose the right university and program.",
+        "color": "#3B82F6",
+        "delay": "0.1s",
+        "stats": "500+",
+        "statsLabel": "Students Guided"
+      },
+      {
+        "icon": "Globe",
+        "title": "Global Network",
+        "subtitle": "Worldwide Partnerships",
+        "description": "Access to top universities across Australia, Canada, UK, USA, and more through our extensive network.",
+        "color": "#10B981",
+        "delay": "0.2s",
+        "stats": "100+",
+        "statsLabel": "Partner Universities"
+      },
+      {
+        "icon": "Award",
+        "title": "High Success Rate",
+        "subtitle": "Proven Track Record",
+        "description": "95% success rate in university admissions with thousands of satisfied students worldwide.",
+        "color": "#F59E0B",
+        "delay": "0.3s",
+        "stats": "95%",
+        "statsLabel": "Success Rate"
+      },
+      {
+        "icon": "Users",
+        "title": "Comprehensive Support",
+        "subtitle": "End-to-End Service",
+        "description": "From application to visa processing and pre-departure guidance, we support you every step of the way.",
+        "color": "#8B5CF6",
+        "delay": "0.4s",
+        "stats": "24/7",
+        "statsLabel": "Support Available"
+      }
+    ]
+  },
+  "howItWorks": {
+    "title": "How Our Platform Works",
+    "description": "Simple steps to start your international education journey",
+    "language": "en",
+    "steps": [
+      {
+        "step": "01",
+        "title": "Consultation",
+        "subtitle": "Free Initial Assessment",
+        "description": "Book a free consultation with our expert counselors to discuss your academic goals and preferences.",
+        "icon": "MessageCircle",
+        "color": "#3B82F6",
+        "delay": "0.1s"
+      },
+      {
+        "step": "02",
+        "title": "University Selection",
+        "subtitle": "Choose Your Destination",
+        "description": "Browse our extensive database of universities and programs to find the perfect match for your goals.",
+        "icon": "Search",
+        "color": "#10B981",
+        "delay": "0.2s"
+      },
+      {
+        "step": "03",
+        "title": "Application Process",
+        "subtitle": "Submit Your Application",
+        "description": "Our team will help you prepare and submit your application with all required documents.",
+        "icon": "FileText",
+        "color": "#F59E0B",
+        "delay": "0.3s"
+      },
+      {
+        "step": "04",
+        "title": "Visa & Travel",
+        "subtitle": "Prepare for Departure",
+        "description": "Get assistance with visa applications, accommodation, and pre-departure preparations.",
+        "icon": "Plane",
+        "color": "#8B5CF6",
+        "delay": "0.4s"
+      }
+    ]
+  }
+}

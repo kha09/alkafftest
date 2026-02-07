@@ -22,6 +22,7 @@ model HeroSlide {
   image       String
   gradient    String
   order       Int      @default(0)
+  language    String   @default("ar") // "ar" for Arabic, "en" for English
 }
 
 model University {
@@ -83,6 +84,7 @@ model Testimonial {
   featured   Boolean
   category   String
   order      Int    @default(0)
+  language   String @default("ar") // "ar" for Arabic, "en" for English
 }
 
 model Faq {
@@ -92,6 +94,7 @@ model Faq {
   category String
   popular  Boolean
   order    Int    @default(0)
+  language String @default("ar") // "ar" for Arabic, "en" for English
 }
 
 model WhySMAlkaff {
@@ -99,6 +102,7 @@ model WhySMAlkaff {
   title       String
   description String
   features    String   // JSON string for features array
+  language    String   @default("ar") // "ar" for Arabic, "en" for English
 }
 
 model HowItWorks {
@@ -106,6 +110,7 @@ model HowItWorks {
   title       String
   description String
   steps       String   // JSON string for steps array
+  language    String   @default("ar") // "ar" for Arabic, "en" for English
 }
 
 model HomePageUniversity {
@@ -121,6 +126,7 @@ model HomePageUniversity {
   flag           String
   order          Int    @default(0)
   freeOfferLetter Boolean @default(false)
+  language       String @default("ar") // "ar" for Arabic, "en" for English
 }
 
 model FormSubmission {

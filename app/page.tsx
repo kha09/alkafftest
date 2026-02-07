@@ -3,6 +3,8 @@
 import React from "react"
 
 import { useState, useEffect, useRef } from "react"
+import { useLanguage } from "@/contexts/LanguageContext"
+import { LanguageSwitcher } from "@/components/language-switcher"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -85,6 +87,7 @@ const iconMap: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>
 }
 
 export default function LandingPage() {
+  const { language, t } = useLanguage()
   const [content, setContent] = useState<HomePageContent | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -109,7 +112,7 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const response = await fetch('/api/homepage')
+        const response = await fetch(`/api/homepage?lang=${language}`)
         if (!response.ok) throw new Error('Failed to fetch content')
         const data: HomePageContent = await response.json()
         setContent(data)
@@ -121,7 +124,7 @@ export default function LandingPage() {
     }
 
     fetchContent()
-  }, [])
+  }, [language])
 
   // Filter testimonials based on active filter
   const filteredTestimonials = content?.testimonials.filter(
@@ -297,6 +300,7 @@ export default function LandingPage() {
             </nav>
 
             <div className="flex items-center space-x-4" dir="rtl">
+              <LanguageSwitcher />
               <Button variant="outline" className="hidden md:inline-flex">
                 تسجيل الدخول
               </Button>

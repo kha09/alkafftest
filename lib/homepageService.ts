@@ -1,16 +1,33 @@
 import db from '@/lib/db'
+import { PrismaClient } from '@/lib/generated/prisma'
 import { HomePageContent, HeroSlide, University, Testimonial, Faq, WhySMAlkaff, HowItWorks } from '@/lib/types'
 
-export async function getHomepageContent(): Promise<HomePageContent> {
+export async function getHomepageContent(language: string = 'ar'): Promise<HomePageContent> {
   try {
-    // Fetch all content types from the database
+    // Fetch all content types from the database filtered by language
     const [heroSlides, universities, testimonials, faqs, whySMAlkaff, howItWorks] = await Promise.all([
-      db.heroSlide.findMany({ orderBy: { order: 'asc' } }),
-      db.homePageUniversity.findMany({ orderBy: { order: 'asc' } }),
-      db.testimonial.findMany({ orderBy: { order: 'asc' } }),
-      db.faq.findMany({ orderBy: { order: 'asc' } }),
-      db.whySMAlkaff.findMany(),
-      db.howItWorks.findMany(),
+      db.heroSlide.findMany({ 
+        where: { language },
+        orderBy: { order: 'asc' } 
+      }),
+      db.homePageUniversity.findMany({ 
+        where: { language },
+        orderBy: { order: 'asc' } 
+      }),
+      db.testimonial.findMany({ 
+        where: { language },
+        orderBy: { order: 'asc' } 
+      }),
+      db.faq.findMany({ 
+        where: { language },
+        orderBy: { order: 'asc' } 
+      }),
+      db.whySMAlkaff.findMany({
+        where: { language }
+      }),
+      db.howItWorks.findMany({
+        where: { language }
+      }),
     ])
 
     // If no content exists, return empty arrays
@@ -85,22 +102,25 @@ export async function getHomepageContent(): Promise<HomePageContent> {
   }
 }
 
-export async function updateHomepageContent(content: HomePageContent): Promise<void> {
+export async function updateHomepageContent(content: HomePageContent, language: string = 'ar'): Promise<void> {
   try {
     // Start a transaction to ensure data consistency
-    await db.$transaction(async (prisma) => {
-      // Delete homepage content that doesn't have foreign key constraints
-      await prisma.heroSlide.deleteMany()
-      await prisma.testimonial.deleteMany()
-      await prisma.faq.deleteMany()
+    await db.$transaction(async (prisma: PrismaClient) => {
+      // Delete homepage content for this language that doesn't have foreign key constraints
+      await prisma.heroSlide.deleteMany({ where: { language } })
+      await prisma.testimonial.deleteMany({ where: { language } })
+      await prisma.faq.deleteMany({ where: { language } })
 
       // Handle WhySMAlkaff section
       if (content.whySMAlkaff) {
-        const existingWhySMAlkaff = await prisma.whySMAlkaff.findMany();
+        const existingWhySMAlkaff = await prisma.whySMAlkaff.findMany({
+          where: { language }
+        });
         const whySMAlkaffData = {
           title: content.whySMAlkaff.title,
           description: content.whySMAlkaff.description,
           features: JSON.stringify(content.whySMAlkaff.features),
+          language,
         };
 
         if (existingWhySMAlkaff.length > 0) {
@@ -119,13 +139,16 @@ export async function updateHomepageContent(content: HomePageContent): Promise<v
 
       // Handle HowItWorks section
       if (content.howItWorks) {
-        const existingHowItWorks = await prisma.howItWorks.findMany();
+        const existingHowItWorks = await prisma.howItWorks.findMany({
+          where: { language }
+        });
         // Ensure proper encoding for Arabic characters
         const stepsString = JSON.stringify(content.howItWorks.steps).replace(/[\u007F-\u009F]/g, "");
         const howItWorksData = {
           title: content.howItWorks.title,
           description: content.howItWorks.description,
           steps: stepsString,
+          language,
         };
 
         if (existingHowItWorks.length > 0) {
@@ -143,8 +166,8 @@ export async function updateHomepageContent(content: HomePageContent): Promise<v
       }
 
       // Handle homepage universities - these are completely separate from the main university database
-      // Delete all existing homepage universities and recreate them
-      await prisma.homePageUniversity.deleteMany()
+      // Delete all existing homepage universities for this language and recreate them
+      await prisma.homePageUniversity.deleteMany({ where: { language } })
       
       // Create new homepage universities
       await prisma.homePageUniversity.createMany({
@@ -159,6 +182,7 @@ export async function updateHomepageContent(content: HomePageContent): Promise<v
           color: university.color,
           flag: university.flag,
           freeOfferLetter: university.freeOfferLetter,
+          language,
           order: index,
         })),
       })
@@ -171,6 +195,7 @@ export async function updateHomepageContent(content: HomePageContent): Promise<v
           description: slide.description,
           image: slide.image,
           gradient: slide.gradient,
+          language,
           order: index,
         })),
       })
@@ -190,6 +215,7 @@ export async function updateHomepageContent(content: HomePageContent): Promise<v
           hasVideo: testimonial.hasVideo,
           featured: testimonial.featured,
           category: testimonial.category,
+          language,
           order: index,
         })),
       })
@@ -201,6 +227,7 @@ export async function updateHomepageContent(content: HomePageContent): Promise<v
           answer: faq.answer,
           category: faq.category,
           popular: faq.popular,
+          language,
           order: index,
         })),
       })
@@ -213,15 +240,16 @@ export async function updateHomepageContent(content: HomePageContent): Promise<v
 
 export async function initializeDefaultContent(): Promise<void> {
   try {
-    const content = await getHomepageContent()
+    // Check if Arabic content already exists
+    const arabicContent = await getHomepageContent('ar')
     
     // Check if content already exists
-    if (content.heroSlides.length > 0 || 
-        content.universities.length > 0 || 
-        content.testimonials.length > 0 || 
-        content.faqs.length > 0 ||
-        content.whySMAlkaff ||
-        content.howItWorks) {
+    if (arabicContent.heroSlides.length > 0 || 
+        arabicContent.universities.length > 0 || 
+        arabicContent.testimonials.length > 0 || 
+        arabicContent.faqs.length > 0 ||
+        arabicContent.whySMAlkaff ||
+        arabicContent.howItWorks) {
       return
     }
 
@@ -229,8 +257,48 @@ export async function initializeDefaultContent(): Promise<void> {
     const defaultContent = await import('@/data/homepage-content.json')
     
     // Save default content to database
-    await updateHomepageContent(defaultContent.default || defaultContent)
+    await updateHomepageContent(defaultContent.default || defaultContent, 'ar')
   } catch (error) {
     console.error('Error initializing default content:', error)
+  }
+}
+
+// Function to seed English content
+export async function seedEnglishContent(): Promise<void> {
+  try {
+    // Load English content from the data file
+    const englishContent = await import('@/data/english-content.json')
+    const content = englishContent.default || englishContent
+    
+    // Transform the content to match HomePageContent interface
+    const transformedContent: HomePageContent = {
+      heroSlides: content.heroSlides || [],
+      universities: (content.universities || []).map((uni: any) => ({
+        id: 0, // Will be assigned by database
+        ...uni
+      })),
+      testimonials: (content.testimonials || []).map((testimonial: any) => ({
+        id: 0, // Will be assigned by database
+        ...testimonial
+      })),
+      faqs: (content.faqs || []).map((faq: any) => ({
+        id: 0, // Will be assigned by database
+        ...faq
+      })),
+      whySMAlkaff: content.whySMAlkaff ? {
+        id: 0, // Will be assigned by database
+        ...content.whySMAlkaff
+      } : undefined,
+      howItWorks: content.howItWorks ? {
+        id: 0, // Will be assigned by database
+        ...content.howItWorks
+      } : undefined
+    }
+    
+    // Save English content to database
+    await updateHomepageContent(transformedContent, 'en')
+  } catch (error) {
+    console.error('Error seeding English content:', error)
+    throw new Error('Failed to seed English content')
   }
 }
