@@ -58,6 +58,7 @@ export default withAuth(
           pathname.startsWith('/api/homepage') ||
           pathname.startsWith('/api/content') ||
           pathname.startsWith('/api/form-submissions') ||
+          pathname.startsWith('/api/whatsapp-settings') ||
           pathname.startsWith('/api/auth') ||
           pathname === '/login' ||
           pathname.startsWith('/_next') ||

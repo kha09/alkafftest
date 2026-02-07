@@ -1,3 +1,5 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -6,9 +8,81 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import { User, Bell, Shield, Palette, Database, Mail, Save } from "lucide-react"
+import { User, Bell, Shield, Palette, Database, Mail, Save, MessageCircle } from "lucide-react"
+import { useState, useEffect } from "react"
+import { useToast } from "@/hooks/use-toast"
+
+interface WhatsAppSettings {
+  id?: number
+  phoneNumber: string
+  displayText: string
+  isEnabled: boolean
+  position: string
+  welcomeMessage: string
+}
 
 export default function SettingsPage() {
+  const [whatsappSettings, setWhatsappSettings] = useState<WhatsAppSettings>({
+    phoneNumber: '',
+    displayText: 'تواصل معنا عبر واتساب',
+    isEnabled: false,
+    position: 'bottom-right',
+    welcomeMessage: 'مرحباً! كيف يمكنني مساعدتك؟'
+  })
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
+
+  // Load WhatsApp settings on component mount
+  useEffect(() => {
+    fetchWhatsAppSettings()
+  }, [])
+
+  const fetchWhatsAppSettings = async () => {
+    try {
+      const response = await fetch('/api/admin/whatsapp-settings')
+      if (response.ok) {
+        const data = await response.json()
+        setWhatsappSettings(data)
+      }
+    } catch (error) {
+      console.error('Error fetching WhatsApp settings:', error)
+    }
+  }
+
+  const saveWhatsAppSettings = async () => {
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/admin/whatsapp-settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(whatsappSettings),
+      })
+
+      if (response.ok) {
+        toast({
+          title: "تم الحفظ بنجاح",
+          description: "تم حفظ إعدادات واتساب بنجاح",
+        })
+      } else {
+        const error = await response.json()
+        toast({
+          title: "خطأ في الحفظ",
+          description: error.error || "حدث خطأ أثناء حفظ الإعدادات",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "خطأ في الحفظ",
+        description: "حدث خطأ أثناء حفظ الإعدادات",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
   return (
     <div className="p-6 space-y-6" dir="rtl">
       {/* Header */}
@@ -24,13 +98,14 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="profile">الملف الشخصي</TabsTrigger>
           <TabsTrigger value="notifications">الإشعارات</TabsTrigger>
           <TabsTrigger value="security">الأمان</TabsTrigger>
           <TabsTrigger value="appearance">المظهر</TabsTrigger>
           <TabsTrigger value="system">النظام</TabsTrigger>
           <TabsTrigger value="email">البريد الإلكتروني</TabsTrigger>
+          <TabsTrigger value="whatsapp">واتساب</TabsTrigger>
           <TabsTrigger value="integrations">التكاملات</TabsTrigger>
         </TabsList>
 
@@ -376,6 +451,156 @@ export default function SettingsPage() {
                     </div>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="whatsapp" className="mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5" />
+                  إعدادات واتساب
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-[#111827]">تفعيل زر واتساب</h4>
+                    <p className="text-sm text-[#4b5563]">إظهار زر واتساب العائم في الصفحات العامة</p>
+                  </div>
+                  <Switch 
+                    checked={whatsappSettings.isEnabled}
+                    onCheckedChange={(checked) => 
+                      setWhatsappSettings(prev => ({ ...prev, isEnabled: checked }))
+                    }
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="phoneNumber">رقم واتساب</Label>
+                  <Input 
+                    id="phoneNumber" 
+                    placeholder="+966501234567"
+                    value={whatsappSettings.phoneNumber}
+                    onChange={(e) => 
+                      setWhatsappSettings(prev => ({ ...prev, phoneNumber: e.target.value }))
+                    }
+                  />
+                  <p className="text-xs text-[#4b5563] mt-1">يجب أن يتضمن رمز الدولة (مثال: +966501234567)</p>
+                </div>
+
+                <div>
+                  <Label htmlFor="displayText">نص الزر</Label>
+                  <Input 
+                    id="displayText" 
+                    value={whatsappSettings.displayText}
+                    onChange={(e) => 
+                      setWhatsappSettings(prev => ({ ...prev, displayText: e.target.value }))
+                    }
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="position">موضع الزر</Label>
+                  <Select 
+                    value={whatsappSettings.position}
+                    onValueChange={(value) => 
+                      setWhatsappSettings(prev => ({ ...prev, position: value }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="bottom-right">أسفل اليمين</SelectItem>
+                      <SelectItem value="bottom-left">أسفل اليسار</SelectItem>
+                      <SelectItem value="top-right">أعلى اليمين</SelectItem>
+                      <SelectItem value="top-left">أعلى اليسار</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="welcomeMessage">رسالة الترحيب</Label>
+                  <Textarea 
+                    id="welcomeMessage" 
+                    placeholder="مرحباً! كيف يمكنني مساعدتك؟"
+                    value={whatsappSettings.welcomeMessage}
+                    onChange={(e) => 
+                      setWhatsappSettings(prev => ({ ...prev, welcomeMessage: e.target.value }))
+                    }
+                  />
+                  <p className="text-xs text-[#4b5563] mt-1">هذه الرسالة ستظهر مسبقاً في محادثة واتساب</p>
+                </div>
+
+                <Button 
+                  onClick={saveWhatsAppSettings} 
+                  disabled={isLoading}
+                  className="w-full"
+                >
+                  {isLoading ? "جاري الحفظ..." : "حفظ إعدادات واتساب"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>معاينة الزر</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="relative h-64 bg-[#f3f4f6] rounded-lg overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+                    <div className="text-center text-[#4b5563] text-sm">معاينة الصفحة</div>
+                    
+                    {whatsappSettings.isEnabled && whatsappSettings.phoneNumber && (
+                      <div 
+                        className={`absolute w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform ${
+                          whatsappSettings.position === 'bottom-right' ? 'bottom-4 right-4' :
+                          whatsappSettings.position === 'bottom-left' ? 'bottom-4 left-4' :
+                          whatsappSettings.position === 'top-right' ? 'top-4 right-4' :
+                          'top-4 left-4'
+                        }`}
+                        title={whatsappSettings.displayText}
+                      >
+                        <MessageCircle className="w-8 h-8 text-white" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-medium text-[#111827]">معلومات الزر</h4>
+                  <div className="text-sm text-[#4b5563] space-y-1">
+                    <div><strong>الحالة:</strong> {whatsappSettings.isEnabled ? 'مفعل' : 'معطل'}</div>
+                    <div><strong>الرقم:</strong> {whatsappSettings.phoneNumber || 'غير محدد'}</div>
+                    <div><strong>الموضع:</strong> {
+                      whatsappSettings.position === 'bottom-right' ? 'أسفل اليمين' :
+                      whatsappSettings.position === 'bottom-left' ? 'أسفل اليسار' :
+                      whatsappSettings.position === 'top-right' ? 'أعلى اليمين' :
+                      'أعلى اليسار'
+                    }</div>
+                  </div>
+                </div>
+
+                {whatsappSettings.isEnabled && whatsappSettings.phoneNumber && (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-green-800">
+                      <MessageCircle className="w-4 h-4" />
+                      <span className="text-sm font-medium">الزر مفعل ومرئي للزوار</span>
+                    </div>
+                  </div>
+                )}
+
+                {whatsappSettings.isEnabled && !whatsappSettings.phoneNumber && (
+                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="text-yellow-800 text-sm">
+                      <strong>تحذير:</strong> يجب إدخال رقم واتساب لتفعيل الزر
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

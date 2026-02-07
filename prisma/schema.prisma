@@ -373,3 +373,14 @@ model Notification {
   actionUrl       String?    // URL to navigate to when clicking notification
   metadata        String?    // JSON string for additional data
 }
+
+model WhatsAppSettings {
+  id              Int        @id @default(autoincrement())
+  phoneNumber     String     // WhatsApp phone number with country code (e.g., +966501234567)
+  displayText     String     @default("تواصل معنا عبر واتساب") // Text to display on hover
+  isEnabled       Boolean    @default(true) // Whether the WhatsApp button is enabled
+  position        String     @default("bottom-right") // Position of the floating button
+  welcomeMessage  String     @default("مرحباً! كيف يمكنني مساعدتك؟") // Pre-filled message when opening WhatsApp
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
