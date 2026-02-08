@@ -1495,16 +1495,16 @@ export default function LandingPage() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center space-x-3 bg-white/10 backdrop-blur-sm text-white px-6 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in-up">
-              <MessageSquare className="h-4 w-4" />
-              <span>تجارب حقيقية</span>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              شهادات وتجارب
-            </h2>
-            <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              استمع إلى قصص نجاح طلابنا وتجاربهم مع منصتنا من مختلف أنحاء العالم
-            </p>
+              <div className="inline-flex items-center space-x-3 bg-white/10 backdrop-blur-sm text-white px-6 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in-up">
+                <MessageSquare className="h-4 w-4" />
+                <span>تجارب حقيقية</span>
+              </div>
+              <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                شهادات وتجارب
+              </h2>
+              <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+                استمع إلى قصص نجاح طلابنا وتجاربهم مع منصتنا من مختلف أنحاء العالم
+              </p>
           </div>
 
           {/* Testimonial Filters */}
