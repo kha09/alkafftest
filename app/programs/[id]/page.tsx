@@ -34,7 +34,7 @@ import { ApplicationForm } from '@/components/application-form'
 export default function ProgramDetailPage() {
   const params = useParams()
   const programId = params.id
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
   
   const [program, setProgram] = useState<Program | null>(null)
   const [loading, setLoading] = useState(true)
@@ -145,12 +145,12 @@ export default function ProgramDetailPage() {
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <FileText className="h-12 w-12 text-gray-400" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-700 mb-4">حدث خطأ أثناء تحميل التفاصيل</h3>
-            <p className="text-gray-500 mb-8">{error || 'تعذر تحميل معلومات البرنامج'}</p>
+            <h3 className="text-2xl font-bold text-gray-700 mb-4">{t('program.detail.error.title')}</h3>
+            <p className="text-gray-500 mb-8">{error || t('program.detail.error.message')}</p>
             <Link href="/universities">
               <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                 <ArrowLeft className="ml-2 h-5 w-5" />
-                العودة إلى قائمة الجامعات
+                {t('program.detail.error.back')}
               </Button>
             </Link>
           </div>
@@ -174,26 +174,26 @@ export default function ProgramDetailPage() {
 
             <nav className="hidden md:flex items-center space-x-8 space-x-reverse">
               <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
-                الرئيسية
+                {t('nav.home')}
               </Link>
               <Link href="/universities" className="text-blue-600 font-medium">
-                التخصصات والجامعات
+                {t('nav.universities')}
               </Link>
               <Link href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
-                من نحن
+                {t('nav.about')}
               </Link>
               <Link href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
-                تواصل معنا
+                {t('nav.contact')}
               </Link>
             </nav>
 
             <div className="flex items-center space-x-4 space-x-reverse">
               <LanguageSwitcher />
               <Button variant="outline" className="hidden md:inline-flex">
-                تسجيل الدخول
+                {t('nav.login')}
               </Button>
               <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                ابدأ الآن
+                {t('nav.start')}
               </Button>
             </div>
           </div>
@@ -205,7 +205,7 @@ export default function ProgramDetailPage() {
           <Link href={`/universities/${program.department?.university?.id || '#'}`}>
             <Button variant="outline" className="mb-4" disabled={!program.department?.university}>
               <ArrowLeft className="ml-2 h-4 w-4" />
-              العودة إلى {program.department?.university?.name || 'الجامعة'}
+              {t('program.detail.back.to')} {program.department?.university?.name || t('program.detail.university')}
             </Button>
           </Link>
         </div>
@@ -228,7 +228,7 @@ export default function ProgramDetailPage() {
                     </Button>
                   </h1>
                   {copied && (
-                    <p className="text-sm text-green-600">تم نسخ اسم البرنامج</p>
+                    <p className="text-sm text-green-600">{t('program.detail.copied')}</p>
                   )}
                   <p className="text-gray-600">{program.description}</p>
                 </div>
@@ -238,7 +238,7 @@ export default function ProgramDetailPage() {
                 <div className="flex items-center space-x-2 space-x-reverse bg-blue-50 p-4 rounded-lg">
                   <GraduationCap className="h-6 w-6 text-blue-600" />
                   <div>
-                    <p className="text-sm text-gray-500">المؤهل</p>
+                    <p className="text-sm text-gray-500">{t('program.detail.qualification')}</p>
                     <p className="font-medium">{program.qualification}</p>
                   </div>
                 </div>
@@ -246,30 +246,30 @@ export default function ProgramDetailPage() {
                 <div className="flex items-center space-x-2 space-x-reverse bg-green-50 p-4 rounded-lg">
                   <Clock className="h-6 w-6 text-green-600" />
                   <div>
-                    <p className="text-sm text-gray-500">مدة الدراسة</p>
-                    <p className="font-medium">{program.duration} سنوات</p>
+                    <p className="text-sm text-gray-500">{t('program.detail.duration')}</p>
+                    <p className="font-medium">{program.duration} {t('program.detail.duration.years')}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-2 space-x-reverse bg-purple-50 p-4 rounded-lg">
                   <Calendar className="h-6 w-6 text-purple-600" />
                   <div>
-                    <p className="text-sm text-gray-500">أشهر القبول</p>
+                    <p className="text-sm text-gray-500">{t('program.detail.intake')}</p>
                     <p className="font-medium">
                       {program.intakeMonths.split(',').map(month => {
                         const monthMap: Record<string, string> = {
-                          'January': 'يناير',
-                          'February': 'فبراير',
-                          'March': 'مارس',
-                          'April': 'أبريل',
-                          'May': 'مايو',
-                          'June': 'يونيو',
-                          'July': 'يوليو',
-                          'August': 'أغسطس',
-                          'September': 'سبتمبر',
-                          'October': 'أكتوبر',
-                          'November': 'نوفمبر',
-                          'December': 'ديسمبر'
+                          'January': t('month.january'),
+                          'February': t('month.february'),
+                          'March': t('month.march'),
+                          'April': t('month.april'),
+                          'May': t('month.may'),
+                          'June': t('month.june'),
+                          'July': t('month.july'),
+                          'August': t('month.august'),
+                          'September': t('month.september'),
+                          'October': t('month.october'),
+                          'November': t('month.november'),
+                          'December': t('month.december')
                         };
                         return monthMap[month.trim()] || month.trim();
                       }).join(', ')}
@@ -280,7 +280,7 @@ export default function ProgramDetailPage() {
                 <div className="flex items-center space-x-2 space-x-reverse bg-yellow-50 p-4 rounded-lg">
                   <Globe className="h-6 w-6 text-yellow-600" />
                   <div>
-                    <p className="text-sm text-gray-500">متطلبات اللغة</p>
+                    <p className="text-sm text-gray-500">{t('program.detail.english.requirement')}</p>
                     <p className="font-medium">{program.englishRequirement}</p>
                   </div>
                 </div>
@@ -294,7 +294,7 @@ export default function ProgramDetailPage() {
                 {program.offerLetter && (
                   <div className="flex items-center space-x-2 space-x-reverse bg-green-100 px-4 py-2 rounded-full">
                     <CheckCircle className="h-5 w-5 text-green-600" />
-                    <span>خطاب قبول مجاني</span>
+                    <span>{t('program.detail.free.offer')}</span>
                   </div>
                 )}
               </div>
@@ -308,10 +308,10 @@ export default function ProgramDetailPage() {
                   })}
                 >
                   <BookOpen className="ml-2 h-5 w-5" />
-                  التقديم الآن
+                  {t('program.detail.apply.now')}
                 </Button>
                 <Button variant="outline">
-                  طلب استشارة مجانية
+                  {t('program.detail.consultation')}
                 </Button>
               </div>
             </CardContent>
@@ -325,12 +325,12 @@ export default function ProgramDetailPage() {
               <CardTitle className="text-2xl font-bold text-gray-900 flex items-center">
                 <Image
                   src={program.department?.university?.logo || "/placeholder.svg"}
-                  alt={program.department?.university?.name || "الجامعة"}
+                  alt={program.department?.university?.name || t('program.detail.university')}
                   width={40}
                   height={40}
                   className="rounded-lg ml-2"
                 />
-                معلومات الجامعة
+                {t('program.detail.university.info')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -338,7 +338,7 @@ export default function ProgramDetailPage() {
                 <div className="relative">
                   <Image
                     src={program.department?.university?.logo || "/placeholder.svg"}
-                    alt={program.department?.university?.name || "الجامعة"}
+                    alt={program.department?.university?.name || t('program.detail.university')}
                     width={120}
                     height={120}
                     className="rounded-lg"
@@ -349,26 +349,26 @@ export default function ProgramDetailPage() {
                 </div>
                 
                 <div className="text-center md:text-right flex-1">
-                  <h3 className="text-2xl font-bold mb-4">{program.department?.university?.name || "الجامعة"}</h3>
+                  <h3 className="text-2xl font-bold mb-4">{program.department?.university?.name || t('program.detail.university')}</h3>
                   <p className="text-xl text-blue-600 mb-6">{program.department?.university?.country || ""} {program.department?.university?.flag || ""}</p>
                   
                   <div className="flex flex-wrap justify-center md:justify-start gap-4 mb-6">
                     <div className="flex items-center space-x-2 space-x-reverse bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full">
                       <MapPin className="h-5 w-5" />
-                      <span>الترتيب {program.department?.university?.ranking || ""}</span>
+                      <span>{t('program.detail.university.ranking')} {program.department?.university?.ranking || ""}</span>
                     </div>
                     <div className="flex items-center space-x-2 space-x-reverse bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full">
                       <Users className="h-5 w-5" />
-                      <span>{program.department?.university?.students || ""} طالب</span>
+                      <span>{program.department?.university?.students || ""} {t('program.detail.university.students')}</span>
                     </div>
                     <div className="flex items-center space-x-2 space-x-reverse bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full">
                       <Star className="h-5 w-5 text-yellow-300" />
-                      <span>معدل القبول {program.department?.university?.acceptance || ""}</span>
+                      <span>{t('program.detail.university.acceptance')} {program.department?.university?.acceptance || ""}</span>
                     </div>
                     {program.department?.university?.freeOfferLetter && (
                       <div className="flex items-center space-x-2 space-x-reverse bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full">
                         <CheckCircle className="h-5 w-5 text-green-300" />
-                        <span>خطاب قبول مجاني</span>
+                        <span>{t('program.detail.university.free.offer')}</span>
                       </div>
                     )}
                   </div>
@@ -384,20 +384,20 @@ export default function ProgramDetailPage() {
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-gray-900 flex items-center">
                 <CreditCard className="ml-2 h-6 w-6 text-blue-600" />
-                الرسوم الدراسية للطلاب الدوليين
+                {t('program.detail.fees.title')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Yearly Tuition Fees */}
                 <div>
-                  <h3 className="text-xl font-semibold mb-4 text-gray-800">الرسوم الدراسية السنوية</h3>
+                  <h3 className="text-xl font-semibold mb-4 text-gray-800">{t('program.detail.fees.yearly')}</h3>
                   <div className="overflow-x-auto">
                     <table className="w-full text-right">
                       <thead>
                         <tr className="bg-gray-100">
-                          <th className="px-4 py-3 font-semibold text-gray-700">السنة</th>
-                          <th className="px-4 py-3 font-semibold text-gray-700">الرسوم</th>
+                          <th className="px-4 py-3 font-semibold text-gray-700">{t('program.detail.fees.year')}</th>
+                          <th className="px-4 py-3 font-semibold text-gray-700">{t('program.detail.fees.amount')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -414,13 +414,13 @@ export default function ProgramDetailPage() {
 
                 {/* Other Fees */}
                 <div>
-                  <h3 className="text-xl font-semibold mb-4 text-gray-800">رسوم أخرى</h3>
+                  <h3 className="text-xl font-semibold mb-4 text-gray-800">{t('program.detail.fees.other')}</h3>
                   <div className="overflow-x-auto">
                     <table className="w-full text-right">
                       <thead>
                         <tr className="bg-gray-100">
-                          <th className="px-4 py-3 font-semibold text-gray-700">الوصف</th>
-                          <th className="px-4 py-3 font-semibold text-gray-700">الرسوم</th>
+                          <th className="px-4 py-3 font-semibold text-gray-700">{t('program.detail.fees.description')}</th>
+                          <th className="px-4 py-3 font-semibold text-gray-700">{t('program.detail.fees.amount')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -448,9 +448,9 @@ export default function ProgramDetailPage() {
 
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center text-white">
-              <h2 className="text-3xl md:text-5xl font-bold mb-6">هل تحتاج إلى مساعدة في التقديم؟</h2>
+              <h2 className="text-3xl md:text-5xl font-bold mb-6">{t('program.detail.cta.title')}</h2>
               <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-                تواصل مع فريق الخبراء لدينا للحصول على استشارة مجانية ومساعدتك في إكمال طلب التقديم
+                {t('program.detail.cta.description')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
@@ -458,14 +458,14 @@ export default function ProgramDetailPage() {
                   className="bg-white text-blue-600 hover:bg-gray-100 transform hover:scale-105 transition-all duration-200"
                 >
                   <GraduationCap className="ml-2 h-5 w-5" />
-                  طلب استشارة مجانية
+                  {t('program.detail.cta.consultation')}
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
                   className="border-white text-blue-600 hover:bg-white transform hover:scale-105 transition-all duration-200"
                 >
-                  تحدث مع خبير
+                  {t('program.detail.cta.expert')}
                 </Button>
               </div>
             </div>
