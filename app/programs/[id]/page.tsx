@@ -34,7 +34,7 @@ import { ApplicationForm } from '@/components/application-form'
 export default function ProgramDetailPage() {
   const params = useParams()
   const programId = params.id
-  const { language, t } = useLanguage()
+  const { language, t, isRTL } = useLanguage()
   
   const [program, setProgram] = useState<Program | null>(null)
   const [loading, setLoading] = useState(true)
@@ -127,7 +127,7 @@ export default function ProgramDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dir-rtl text-right" dir="rtl">
+      <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 ${isRTL ? 'dir-rtl text-right' : 'dir-ltr text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center h-96">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -139,7 +139,7 @@ export default function ProgramDetailPage() {
 
   if (error || !program) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dir-rtl text-right" dir="rtl">
+      <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 ${isRTL ? 'dir-rtl text-right' : 'dir-ltr text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="container mx-auto px-4 py-8">
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -160,7 +160,7 @@ export default function ProgramDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dir-rtl text-right" dir="rtl">
+    <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 ${isRTL ? 'dir-rtl text-right' : 'dir-ltr text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
       <header className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">

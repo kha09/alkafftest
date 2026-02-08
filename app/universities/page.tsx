@@ -53,7 +53,7 @@ const getSortOptions = (t: any) => [
 ]
 
 export default function UniversitiesPage() {
-  const { language, t } = useLanguage()
+  const { language, t, isRTL } = useLanguage()
   const [universities, setUniversities] = useState<University[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -157,7 +157,7 @@ export default function UniversitiesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dir-rtl text-right" dir="rtl">
+    <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 ${isRTL ? 'dir-rtl text-right' : 'dir-ltr text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
       <header className="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
