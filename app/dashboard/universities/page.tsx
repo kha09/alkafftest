@@ -240,7 +240,7 @@ export default function UniversitiesManagement() {
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent dir="rtl" className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-right">
               {currentUniversity?.id ? 'تعديل الجامعة' : 'إضافة جامعة جديدة'}

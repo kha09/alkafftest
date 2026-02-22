@@ -515,7 +515,7 @@ export default function StudentsPage() {
                 إنشاء طالب
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-6xl w-[95vw] max-h-[95vh] overflow-hidden p-0">
+            <DialogContent dir="rtl" className="max-w-6xl w-[95vw] max-h-[95vh] overflow-hidden p-0">
               <div className="max-h-[95vh] overflow-y-auto">
                 <DialogHeader className="p-6 pb-4 border-b">
                   <DialogTitle className="text-xl font-bold">إنشاء طالب</DialogTitle>
@@ -766,7 +766,7 @@ export default function StudentsPage() {
                                 <Edit className="w-4 h-4" />
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-4xl w-[95vw] max-h-[95vh] overflow-hidden p-0">
+                            <DialogContent dir="rtl" className="max-w-4xl w-[95vw] max-h-[95vh] overflow-hidden p-0">
                               <div className="max-h-[95vh] overflow-y-auto">
                                 <DialogHeader className="p-6 pb-4 border-b sticky top-0 bg-white z-10">
                                   <DialogTitle className="text-xl font-bold">تعديل الطلب</DialogTitle>
@@ -1068,7 +1068,7 @@ export default function StudentsPage() {
         setIsEmailDialogOpen(open)
         if (!open) resetEmailForm()
       }}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>إرسال بريد إلكتروني للجامعة</DialogTitle>
           </DialogHeader>
@@ -1182,7 +1182,7 @@ export default function StudentsPage() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent dir="rtl">
           <AlertDialogHeader>
             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
             <AlertDialogDescription>

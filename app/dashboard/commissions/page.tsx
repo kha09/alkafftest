@@ -380,7 +380,7 @@ export default function CommissionsPage() {
                 إضافة عمولة
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent dir="rtl">
               <DialogHeader>
                 <DialogTitle>إضافة عمولة يدوياً</DialogTitle>
               </DialogHeader>
@@ -645,7 +645,7 @@ export default function CommissionsPage() {
 
       {/* View Commission Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>تفاصيل العمولة #{selectedCommission?.id}</DialogTitle>
           </DialogHeader>

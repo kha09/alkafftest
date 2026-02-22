@@ -209,7 +209,7 @@ export default function EmailTemplatesPage() {
                 إضافة قالب جديد
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>إنشاء قالب بريد إلكتروني جديد</DialogTitle>
                 <DialogDescription>
@@ -459,7 +459,7 @@ export default function EmailTemplatesPage() {
 
       {/* View Template Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>عرض قالب البريد الإلكتروني</DialogTitle>
             <DialogDescription>
@@ -531,7 +531,7 @@ export default function EmailTemplatesPage() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>تحرير قالب البريد الإلكتروني</DialogTitle>
             <DialogDescription>

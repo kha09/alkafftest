@@ -700,7 +700,7 @@ export default function NotesPage() {
 
       {/* Template Dialog */}
       <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent dir="rtl" className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
               {currentTemplate ? 'تعديل قالب' : 'قالب جديد'}
@@ -764,7 +764,7 @@ export default function NotesPage() {
 
       {/* Send Note Dialog */}
       <Dialog open={sendNoteDialogOpen} onOpenChange={setSendNoteDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent dir="rtl" className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>إرسال ملاحظة</DialogTitle>
           </DialogHeader>

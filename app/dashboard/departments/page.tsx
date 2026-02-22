@@ -181,7 +181,7 @@ export default function DepartmentsManagement() {
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent dir="rtl" className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
               {currentDepartment?.id ? 'تعديل القسم' : 'إضافة قسم جديد'}
