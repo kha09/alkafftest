@@ -197,9 +197,11 @@ export default function UniversityDetailPage() {
 
             <div className="flex items-center space-x-4 space-x-reverse">
               <LanguageSwitcher />
-              <Button variant="outline" className="hidden md:inline-flex">
-                {t('nav.login')}
-              </Button>
+              <Link href="/login">
+                <Button variant="outline" className="hidden md:inline-flex">
+                  {t('nav.login')}
+                </Button>
+              </Link>
               <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                 {t('nav.start')}
               </Button>
