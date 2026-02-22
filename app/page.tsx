@@ -42,6 +42,7 @@ import {
   HelpCircle,
   MessageSquare,
   Filter,
+  Sparkles,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -560,15 +561,15 @@ export default function LandingPage() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in-up">
-              <Crown className="h-4 w-4" />
-              <span>{t('universities.badge')}</span>
+            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <Sparkles className="w-4 h-4" />
+              {t('homepage.why.choose.title')}
             </div>
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              {t('universities.title')}
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              {content.whySMAlkaff?.title || t('homepage.why.choose.title')}
             </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              {t('universities.description')}
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              {content.whySMAlkaff?.description || t('homepage.discover.difference')}
             </p>
           </div>
 
@@ -931,10 +932,10 @@ export default function LandingPage() {
           {/* Statistics Section */}
           <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { number: "5000+", label: "طالب راضٍ", icon: Heart },
-              { number: "500+", label: "جامعة شريكة", icon: Globe },
-              { number: "50+", label: "دولة متاحة", icon: Users },
-              { number: "99.9%", label: "مع دل النجاح", icon: Star },
+              { number: "5000+", label: t('homepage.satisfied.student'), icon: Heart },
+              { number: "500+", label: t('homepage.partner.universities'), icon: Globe },
+              { number: "50+", label: t('homepage.available.countries'), icon: Users },
+              { number: "99.9%", label: t('homepage.success.rate'), icon: Star },
             ].map((stat, index) => (
               <div
                 key={index}
@@ -955,9 +956,9 @@ export default function LandingPage() {
           {/* Call to Action */}
           <div className="text-center mt-16">
             <div className="inline-flex items-center space-x-4 bg-white/10 backdrop-blur-lg rounded-full px-8 py-4 border border-white/20 hover:border-white/40 transition-all duration-300 hover:scale-105">
-              <span className="text-white font-medium">اكتشف الفرق بنفسك</span>
+              <span className="text-white font-medium">{t('homepage.discover.difference')}</span>
               <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 rounded-full px-6 py-2 transform hover:scale-105 transition-all duration-200">
-                جرب المنصة مجاناً
+                {t('homepage.try.platform')}
               </Button>
             </div>
           </div>
@@ -1022,10 +1023,10 @@ export default function LandingPage() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in-up">
-              <Zap className="h-4 w-4" />
-              <span>عملية بسيطة ومتطورة</span>
-            </div>
+              <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in-up">
+                <Zap className="h-4 w-4" />
+                <span>{t('homepage.simple.process')}</span>
+              </div>
             <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
               {content.howItWorks?.title || "كيف تعمل المنصة؟"}
             </h2>
@@ -1138,9 +1139,9 @@ export default function LandingPage() {
           {/* Call to Action */}
           <div className="text-center mt-16">
             <div className="inline-flex items-center space-x-4 bg-white/80 backdrop-blur-lg rounded-full px-8 py-4 border border-white/20 hover:border-white/40 transition-all duration-300 hover:scale-105 shadow-lg">
-              <span className="text-gray-700 font-medium">جاهز للبدء؟</span>
+              <span className="text-gray-700 font-medium">{t('homepage.ready.start')}</span>
               <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white border-0 rounded-full px-6 py-2 transform hover:scale-105 transition-all duration-200">
-                ابدأ رحلتك الآن
+                {t('homepage.start.journey')}
               </Button>
             </div>
           </div>
@@ -1497,13 +1498,13 @@ export default function LandingPage() {
           <div className="text-center mb-12">
               <div className="inline-flex items-center space-x-3 bg-white/10 backdrop-blur-sm text-white px-6 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in-up">
                 <MessageSquare className="h-4 w-4" />
-                <span>تجارب حقيقية</span>
+                <span>{t('homepage.real.experiences')}</span>
               </div>
               <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                شهادات وتجارب
+                {t('homepage.testimonials.experiences')}
               </h2>
               <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-                استمع إلى قصص نجاح طلابنا وتجاربهم مع منصتنا من مختلف أنحاء العالم
+                {t('homepage.testimonials.experiences')}
               </p>
           </div>
 
