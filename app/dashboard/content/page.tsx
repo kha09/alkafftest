@@ -248,7 +248,7 @@ export default function ContentEditor() {
 
         <TabsContent value="hero" className="space-y-6">
           <Card>
-            <CardHeader>
+            <CardHeader dir="rtl">
               <CardTitle>شرائح البانر الرئيسي</CardTitle>
               <CardDescription>
                 إدارة الشرائح التي تظهر في أعلى الصفحة الرئيسية
@@ -265,7 +265,7 @@ export default function ContentEditor() {
 
         <TabsContent value="universities" className="space-y-6">
           <Card>
-            <CardHeader>
+            <CardHeader dir="rtl">
               <CardTitle>قسم الجامعات</CardTitle>
               <CardDescription>
                 إدارة الجامعات المعروضة في الصفحة الرئيسية
@@ -282,7 +282,7 @@ export default function ContentEditor() {
 
         <TabsContent value="testimonials" className="space-y-6">
           <Card>
-            <CardHeader>
+            <CardHeader dir="rtl">
               <CardTitle>شهادات الطلاب</CardTitle>
               <CardDescription>
                 إدارة شهادات وتقييمات الطلاب المعروضة في الموقع
@@ -299,7 +299,7 @@ export default function ContentEditor() {
 
         <TabsContent value="faqs" className="space-y-6">
           <Card>
-            <CardHeader>
+            <CardHeader dir="rtl">
               <CardTitle>الأسئلة الشائعة</CardTitle>
               <CardDescription>
                 إدارة الأسئلة والأجوبة الشائعة للموقع
@@ -316,7 +316,7 @@ export default function ContentEditor() {
 
         <TabsContent value="why" className="space-y-6">
           <Card>
-            <CardHeader>
+            <CardHeader dir="rtl">
               <CardTitle>لماذا SM Alkaff؟</CardTitle>
               <CardDescription>
                 إدارة قسم مميزات وفوائد استخدام منصة SM Alkaff
@@ -333,7 +333,7 @@ export default function ContentEditor() {
 
         <TabsContent value="how" className="space-y-6">
           <Card>
-            <CardHeader>
+            <CardHeader dir="rtl">
               <CardTitle>كيف تعمل المنصة؟</CardTitle>
               <CardDescription>
                 إدارة قسم شرح خطوات استخدام المنصة
