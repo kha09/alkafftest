@@ -22,6 +22,9 @@ interface UniversityFormData extends Omit<University, 'logo'> {
   logo: string | File;
 }
 
+// Default placeholder logo
+const DEFAULT_LOGO = '/placeholder-logo.png'
+
 export default function UniversitiesManagement() {
   const [universities, setUniversities] = useState<University[]>([])
   const [selectedLanguage, setSelectedLanguage] = useState<'ar' | 'en'>('ar')
@@ -54,7 +57,7 @@ export default function UniversitiesManagement() {
       id: 0,
       name: '',
       country: '',
-      logo: '',
+      logo: DEFAULT_LOGO,
       ranking: '',
       students: '',
       programs: '',
@@ -277,8 +280,8 @@ export default function UniversitiesManagement() {
 
                 <EnhancedFileUpload
                   label="شعار الجامعة"
-                  value={currentUniversity.logo instanceof File ? currentUniversity.logo : null}
-                  onChange={(file) => handleInputChange('logo', file || '')}
+                  value={currentUniversity.logo instanceof File ? currentUniversity.logo : (typeof currentUniversity.logo === 'string' ? currentUniversity.logo : null)}
+                  onChange={(file) => handleInputChange('logo', file || DEFAULT_LOGO)}
                   accept="image/*"
                   maxSize={5}
                   required

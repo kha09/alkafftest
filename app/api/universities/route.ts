@@ -137,8 +137,11 @@ export async function POST(request: Request) {
     const { searchParams } = new URL(request.url)
     const language = searchParams.get('language') || 'ar'
     
+    // Default placeholder logo
+    const DEFAULT_LOGO = '/placeholder-logo.png'
+    
     // Handle logo file upload
-    let logoPath = universityData.logo; // Default to existing logo URL if no file is uploaded
+    let logoPath = universityData.logo && universityData.logo.length > 0 ? universityData.logo : DEFAULT_LOGO;
     const logoFile = formData.get('logo') as File | null;
     
     if (logoFile && logoFile.size > 0) {
@@ -164,10 +167,24 @@ export async function POST(request: Request) {
           const fileResult = await saveFile(logoFile, 'university-logos', Date.now());
           logoPath = fileResult.relativePath;
         }
-      } catch (uploadError) {
-        console.error('Error uploading logo:', uploadError);
+      } catch (uploadError: any) {
+        // Log detailed error information for debugging
+        const errorMessage = uploadError instanceof Error ? uploadError.message : String(uploadError);
+        const errorStack = uploadError instanceof Error ? uploadError.stack : undefined;
+        
+        console.error('='.repeat(50));
+        console.error('S3 UPLOAD ERROR DETAILS:');
+        console.error('Error message:', errorMessage);
+        console.error('Error stack:', errorStack);
+        console.error('S3 Config check:', validateS3Config());
+        console.error('File name:', logoFile.name);
+        console.error('File size:', logoFile.size);
+        console.error('File type:', logoFile.type);
+        console.error('='.repeat(50));
+        
+        // Provide more helpful error message
         return NextResponse.json(
-          { error: 'فشل في رفع شعار الجامعة' },
+          { error: `فشل في رفع شعار الجامعة: ${errorMessage}` },
           { status: 500 }
         );
       }
@@ -175,6 +192,15 @@ export async function POST(request: Request) {
     
     // Remove fields that are computed or have default values
     const { id, nameEn, location, tuitionFee, currency, courses, rating, popular, featured, specializations, departments, logo, ...universityFields } = universityData;
+    
+    // Validate required fields
+    if (!universityFields.name || !universityFields.country || !universityFields.ranking || 
+        !universityFields.students || !universityFields.programs || !universityFields.acceptance) {
+      return NextResponse.json(
+        { error: 'يرجى تعبئة جميع الحقول الإلزامية' },
+        { status: 400 }
+      );
+    }
     
     const newUniversity = await db.university.create({
       data: {

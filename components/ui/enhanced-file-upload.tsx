@@ -8,8 +8,8 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 
 interface EnhancedFileUploadProps {
   label: string
-  value: File | null
-  onChange: (file: File | null) => void
+  value: File | string | null
+  onChange: (file: File | string | null) => void
   accept?: string
   maxSize?: number // in MB
   required?: boolean
@@ -27,8 +27,13 @@ export function EnhancedFileUpload({
 }: EnhancedFileUploadProps) {
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(preview || null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(preview || (typeof value === 'string' ? value : null))
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  // Determine if we have a file or a string URL
+  const hasFile = value instanceof File
+  const hasPreview = typeof value === 'string' && value.length > 0
+  const showPreview = previewUrl && !hasFile
 
   const validateFile = (file: File): boolean => {
     setError(null)
