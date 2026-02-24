@@ -70,7 +70,7 @@ export default function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorP
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">شرائح البانر الرئيسي</h3>
@@ -113,7 +113,7 @@ export default function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorP
                   onClick={() => removeSlide(index)}
                   className="text-red-600 hover:text-red-700"
                 >
-                  <Trash2 className="h-4 w-4 mr-1" />
+                  <Trash2 className="h-4 w-4 ml-1" />
                   حذف
                 </Button>
               </div>

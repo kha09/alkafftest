@@ -95,7 +95,7 @@ export default function UniversitiesEditor({ universities, onChange }: Universit
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">الجامعات المميزة</h3>
@@ -147,7 +147,7 @@ export default function UniversitiesEditor({ universities, onChange }: Universit
                   onClick={() => removeUniversity(index)}
                   className="text-red-600 hover:text-red-700"
                 >
-                  <Trash2 className="h-4 w-4 mr-1" />
+                  <Trash2 className="h-4 w-4 ml-1" />
                   حذف
                 </Button>
               </div>

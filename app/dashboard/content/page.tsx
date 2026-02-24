@@ -120,7 +120,7 @@ export default function ContentEditor() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto" dir="rtl">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">محرر محتوى الصفحة الرئيسية</h1>
@@ -153,12 +153,12 @@ export default function ContentEditor() {
           >
             {isSaving ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Loader2 className="h-4 w-4 animate-spin ml-2" />
                 جاري الحفظ...
               </>
             ) : (
               <>
-                <Save className="h-4 w-4 mr-2" />
+                <Save className="h-4 w-4 ml-2" />
                 حفظ التغييرات
               </>
             )}

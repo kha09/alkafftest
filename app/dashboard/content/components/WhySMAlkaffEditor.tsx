@@ -76,7 +76,7 @@ export default function WhySMAlkaffEditor({ whySMAlkaff, onChange }: WhySMAlkaff
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       <Card>
         <CardHeader>
           <CardTitle>لماذا SM Alkaff؟ - قسم الرأس</CardTitle>

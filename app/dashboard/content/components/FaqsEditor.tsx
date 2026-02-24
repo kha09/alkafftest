@@ -36,51 +36,51 @@ export default function FaqsEditor({ faqs, onChange }: FaqsEditorProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       <div className="flex justify-end">
-        <Button onClick={addFaq}>Add FAQ</Button>
+        <Button onClick={addFaq}>إضافة سؤال جديد</Button>
       </div>
       
       {faqs.map((faq, index) => (
         <Card key={faq.id || index}>
           <CardHeader>
-            <CardTitle>FAQ {index + 1}</CardTitle>
+            <CardTitle>السؤال {index + 1}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Question</label>
+              <label className="text-sm font-medium">السؤال</label>
               <Input
                 value={faq.question}
                 onChange={(e) => updateFaq(index, 'question', e.target.value)}
-                placeholder="FAQ question"
+                placeholder="أدخل السؤال"
               />
             </div>
             
             <div>
-              <label className="text-sm font-medium">Answer</label>
+              <label className="text-sm font-medium">الإجابة</label>
               <Textarea
                 value={faq.answer}
                 onChange={(e) => updateFaq(index, 'answer', e.target.value)}
-                placeholder="FAQ answer"
+                placeholder="أدخل الإجابة"
                 rows={3}
               />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Category</label>
+                <label className="text-sm font-medium">الفئة</label>
                 <Select
                   value={faq.category}
                   onValueChange={(value) => updateFaq(index, 'category', value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder="اختر الفئة" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="application">Application</SelectItem>
-                    <SelectItem value="payment">Payment</SelectItem>
-                    <SelectItem value="universities">Universities</SelectItem>
-                    <SelectItem value="agents">Agents</SelectItem>
+                    <SelectItem value="application">التقديم</SelectItem>
+                    <SelectItem value="payment">الدفع</SelectItem>
+                    <SelectItem value="universities">الجامعات</SelectItem>
+                    <SelectItem value="agents">الوكلاء</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -90,17 +90,17 @@ export default function FaqsEditor({ faqs, onChange }: FaqsEditorProps) {
                   id={`popular-${index}`}
                   checked={faq.popular}
                   onChange={(e) => updateFaq(index, 'popular', e.target.checked)}
-                  className="mr-2"
+                  className="ml-2"
                 />
                 <label htmlFor={`popular-${index}`} className="text-sm font-medium">
-                  Popular
+                  سؤال شائع
                 </label>
               </div>
             </div>
             
             <div className="flex justify-end">
               <Button variant="destructive" onClick={() => removeFaq(index)}>
-                Remove FAQ
+                حذف السؤال
               </Button>
             </div>
           </CardContent>

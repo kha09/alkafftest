@@ -81,7 +81,7 @@ export default function HowItWorksEditor({ howItWorks, onChange }: HowItWorksEdi
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       <Card>
         <CardHeader>
           <CardTitle>كيف تعمل المنصة؟ - قسم الرأس</CardTitle>
