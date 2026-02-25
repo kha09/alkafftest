@@ -20,6 +20,24 @@ export default function DepartmentsManagement() {
   const [error, setError] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentDepartment, setCurrentDepartment] = useState<Department | null>(null)
+  
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedUniversityId, setSelectedUniversityId] = useState<string>('all')
+
+  // Filtered departments based on search and filter
+  const filteredDepartments = departments.filter(department => {
+    const matchesSearch = searchQuery === '' || 
+      department.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesUniversity = selectedUniversityId === 'all' || 
+      department.university?.id.toString() === selectedUniversityId
+    return matchesSearch && matchesUniversity
+  })
+
+  const clearFilters = () => {
+    setSearchQuery('')
+    setSelectedUniversityId('all')
+  }
 
   useEffect(() => {
     fetchData()
@@ -147,38 +165,88 @@ export default function DepartmentsManagement() {
         </div>
       </div>
 
+      {/* Search and Filter Section */}
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex flex-wrap gap-4 items-end">
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="search" className="mb-2 block">البحث بالاسم</Label>
+              <Input
+                id="search"
+                placeholder="ابحث عن قسم..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="university-filter" className="mb-2 block">تصفية حسب الجامعة</Label>
+              <Select value={selectedUniversityId} onValueChange={setSelectedUniversityId}>
+                <SelectTrigger id="university-filter">
+                  <SelectValue placeholder="اختر جامعة" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">كل الجامعات</SelectItem>
+                  {universities.map((university) => (
+                    <SelectItem key={university.id} value={university.id.toString()}>
+                      {university.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {(searchQuery !== '' || selectedUniversityId !== 'all') && (
+              <Button variant="outline" onClick={clearFilters}>
+                مسح الفلاتر
+              </Button>
+            )}
+          </div>
+          {(searchQuery !== '' || selectedUniversityId !== 'all') && (
+            <p className="text-sm text-muted-foreground mt-3">
+              عرض {filteredDepartments.length} من {departments.length} قسم
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>قائمة الأقسام</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>الاسم</TableHead>
-                <TableHead>الجامعة</TableHead>
-                <TableHead className="text-right">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {departments.map((department) => (
-                <TableRow key={department.id}>
-                  <TableCell className="font-medium">{department.name}</TableCell>
-                  <TableCell>{department.university?.name}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="outline" size="sm" className="ml-2" onClick={() => handleEdit(department)}>
-                      تعديل
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDelete(department.id)}>
-                      حذف
-                    </Button>
-                  </TableCell>
+          {filteredDepartments.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {departments.length === 0 ? 'لا توجد أقسام متاحة' : 'لا توجد نتائج تطابق البحث'}
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>الاسم</TableHead>
+                  <TableHead>الجامعة</TableHead>
+                  <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredDepartments.map((department) => (
+                  <TableRow key={department.id}>
+                    <TableCell className="font-medium">{department.name}</TableCell>
+                    <TableCell>{department.university?.name}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="sm" className="ml-2" onClick={() => handleEdit(department)}>
+                        تعديل
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => handleDelete(department.id)}>
+                        حذف
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
+
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent dir="rtl" className="max-w-2xl">
