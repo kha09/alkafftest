@@ -149,7 +149,7 @@ export default function ProgramsManagement() {
   if (error) return <div className="p-6 text-red-500">Error: {error}</div>
 
   return (
-    <div className="p-6">
+    <div className="p-6" dir="rtl">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">إدارة البرامج</h1>
@@ -190,7 +190,7 @@ export default function ProgramsManagement() {
                 <TableHead>المدة</TableHead>
                 <TableHead>الرسوم الدراسية</TableHead>
                 <TableHead>رسالة القبول</TableHead>
-                <TableHead className="text-right">الإجراءات</TableHead>
+                  <TableHead className="text-start">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -201,8 +201,8 @@ export default function ProgramsManagement() {
                   <TableCell>{program.duration}</TableCell>
                   <TableCell>{program.tuitionFees}</TableCell>
                   <TableCell>{program.offerLetter ? 'نعم' : 'لا'}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="outline" size="sm" className="ml-2" onClick={() => handleEdit(program)}>
+                  <TableCell className="text-start">
+                    <Button variant="outline" size="sm" className="ml-2 rtl:ml-0 rtl:mr-2" onClick={() => handleEdit(program)}>
                       تعديل
                     </Button>
                     <Button variant="destructive" size="sm" onClick={() => handleDelete(program.id)}>
@@ -226,7 +226,7 @@ export default function ProgramsManagement() {
           {currentProgram && (
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
+                <Label htmlFor="name" className="text-start">
                   الاسم
                 </Label>
                 <Input
@@ -237,7 +237,7 @@ export default function ProgramsManagement() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="description" className="text-right">
+                <Label htmlFor="description" className="text-start">
                   الوصف
                 </Label>
                 <Textarea
@@ -248,7 +248,7 @@ export default function ProgramsManagement() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="department" className="text-right">
+                <Label htmlFor="department" className="text-start">
                   القسم
                 </Label>
                 <Select
@@ -273,7 +273,7 @@ export default function ProgramsManagement() {
                 </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="tuitionFees" className="text-right">
+                <Label htmlFor="tuitionFees" className="text-start">
                   الرسوم الدراسية
                 </Label>
                 <Input
@@ -284,7 +284,7 @@ export default function ProgramsManagement() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="duration" className="text-right">
+                <Label htmlFor="duration" className="text-start">
                   المدة
                 </Label>
                 <Input
@@ -295,7 +295,7 @@ export default function ProgramsManagement() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="intakeMonths" className="text-right">
+                <Label htmlFor="intakeMonths" className="text-start">
                   أشهر القبول
                 </Label>
                 <Input
@@ -306,7 +306,7 @@ export default function ProgramsManagement() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="qualification" className="text-right">
+                <Label htmlFor="qualification" className="text-start">
                   المؤهل المطلوب
                 </Label>
                 <Input
@@ -317,7 +317,7 @@ export default function ProgramsManagement() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="englishRequirement" className="text-right">
+                <Label htmlFor="englishRequirement" className="text-start">
                   متطلبات اللغة الإنجليزية
                 </Label>
                 <Input
@@ -328,7 +328,7 @@ export default function ProgramsManagement() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="classType" className="text-right">
+                <Label htmlFor="classType" className="text-start">
                   نوع الدراسة
                 </Label>
                 <Input
@@ -353,7 +353,7 @@ export default function ProgramsManagement() {
                 requiredFields={['description', 'fee']}
               />
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="offerLetter" className="text-right">
+                <Label htmlFor="offerLetter" className="text-start">
                   رسالة قبول
                 </Label>
                 <div className="col-span-3">

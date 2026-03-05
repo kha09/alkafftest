@@ -34,6 +34,27 @@ export default function UniversitiesManagement() {
   const [currentUniversity, setCurrentUniversity] = useState<UniversityFormData | null>(null)
   const { toast } = useToast()
 
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCountry, setSelectedCountry] = useState<string>('all')
+
+  // Get unique countries from universities for the filter dropdown
+  const countries = Array.from(new Set(universities.map(u => u.country).filter(Boolean))).sort()
+
+  // Filtered universities based on search and filter
+  const filteredUniversities = universities.filter(university => {
+    const matchesSearch = searchQuery === '' || 
+      university.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCountry = selectedCountry === 'all' || 
+      university.country === selectedCountry
+    return matchesSearch && matchesCountry
+  })
+
+  const clearFilters = () => {
+    setSearchQuery('')
+    setSelectedCountry('all')
+  }
+
   useEffect(() => {
     fetchUniversities()
   }, [selectedLanguage])
@@ -197,50 +218,100 @@ export default function UniversitiesManagement() {
         </div>
       </div>
 
+      {/* Search and Filter Section */}
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex flex-wrap gap-4 items-end">
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="search" className="mb-2 block">البحث بالاسم</Label>
+              <Input
+                id="search"
+                placeholder="ابحث عن جامعة..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="country-filter" className="mb-2 block">تصفية حسب الدولة</Label>
+              <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                <SelectTrigger id="country-filter">
+                  <SelectValue placeholder="اختر دولة" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">كل الدول</SelectItem>
+                  {countries.map((country) => (
+                    <SelectItem key={country} value={country}>
+                      {country}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {(searchQuery !== '' || selectedCountry !== 'all') && (
+              <Button variant="outline" onClick={clearFilters}>
+                مسح الفلاتر
+              </Button>
+            )}
+          </div>
+          {(searchQuery !== '' || selectedCountry !== 'all') && (
+            <p className="text-sm text-muted-foreground mt-3">
+              عرض {filteredUniversities.length} من {universities.length} جامعة
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>قائمة الجامعات</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>الاسم</TableHead>
-                <TableHead>البلد</TableHead>
-                <TableHead>الترتيب</TableHead>
-                <TableHead>الطلاب</TableHead>
-                <TableHead>البرامج</TableHead>
-                <TableHead>معدل القبول</TableHead>
-                <TableHead>رسالة قبول مجانية</TableHead>
-                <TableHead className="text-right">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {universities.map((university) => (
-                <TableRow key={university.id}>
-                  <TableCell className="font-medium">{university.name}</TableCell>
-                  <TableCell>{university.country}</TableCell>
-                  <TableCell>{university.ranking}</TableCell>
-                  <TableCell>{university.students}</TableCell>
-                  <TableCell>{university.programs}</TableCell>
-                  <TableCell>{university.acceptance}</TableCell>
-                  <TableCell>
-                    {university.freeOfferLetter ? 'نعم' : 'لا'}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="outline" size="sm" className="ml-2" onClick={() => handleEdit(university)}>
-                      تعديل
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDelete(university.id)}>
-                      حذف
-                    </Button>
-                  </TableCell>
+          {filteredUniversities.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {universities.length === 0 ? 'لا توجد جامعات متاحة' : 'لا توجد نتائج تطابق البحث'}
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>الاسم</TableHead>
+                  <TableHead>البلد</TableHead>
+                  <TableHead>الترتيب</TableHead>
+                  <TableHead>الطلاب</TableHead>
+                  <TableHead>البرامج</TableHead>
+                  <TableHead>معدل القبول</TableHead>
+                  <TableHead>رسالة قبول مجانية</TableHead>
+                  <TableHead className="text-right">الإجراءات</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredUniversities.map((university) => (
+                  <TableRow key={university.id}>
+                    <TableCell className="font-medium">{university.name}</TableCell>
+                    <TableCell>{university.country}</TableCell>
+                    <TableCell>{university.ranking}</TableCell>
+                    <TableCell>{university.students}</TableCell>
+                    <TableCell>{university.programs}</TableCell>
+                    <TableCell>{university.acceptance}</TableCell>
+                    <TableCell>
+                      {university.freeOfferLetter ? 'نعم' : 'لا'}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="sm" className="ml-2" onClick={() => handleEdit(university)}>
+                        تعديل
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => handleDelete(university.id)}>
+                        حذف
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
+
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent dir="rtl" className="max-w-4xl max-h-[90vh] overflow-y-auto">
