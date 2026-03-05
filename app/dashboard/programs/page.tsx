@@ -558,83 +558,93 @@ export default function ProgramsManagement() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="bulk-name">الاسم</Label>
+                        <div className="grid grid-cols-4 items-center gap-4">
                           <Input
                             id="bulk-name"
                             value={currentProgram.name}
                             onChange={(e) => handleInputChange('name', e.target.value)}
+                            className="col-span-3"
                           />
+                          <Label htmlFor="bulk-name" className="text-end">الاسم</Label>
                         </div>
-                        <div>
-                          <Label htmlFor="bulk-duration">المدة</Label>
+                        <div className="grid grid-cols-4 items-center gap-4">
                           <Input
                             id="bulk-duration"
                             value={currentProgram.duration}
                             onChange={(e) => handleInputChange('duration', e.target.value)}
+                            className="col-span-3"
                           />
+                          <Label htmlFor="bulk-duration" className="text-end">المدة</Label>
                         </div>
                       </div>
-                      <div>
-                        <Label htmlFor="bulk-description">الوصف</Label>
+                      <div className="grid grid-cols-4 items-center gap-4">
                         <Textarea
                           id="bulk-description"
                           value={currentProgram.description}
                           onChange={(e) => handleInputChange('description', e.target.value)}
+                          className="col-span-3"
                         />
+                        <Label htmlFor="bulk-description" className="text-end">الوصف</Label>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="bulk-tuitionFees">الرسوم الدراسية</Label>
+                        <div className="grid grid-cols-4 items-center gap-4">
                           <Input
                             id="bulk-tuitionFees"
                             value={currentProgram.tuitionFees}
                             onChange={(e) => handleInputChange('tuitionFees', e.target.value)}
+                            className="col-span-3"
                           />
+                          <Label htmlFor="bulk-tuitionFees" className="text-end">الرسوم الدراسية</Label>
                         </div>
-                        <div>
-                          <Label htmlFor="bulk-intakeMonths">أشهر القبول</Label>
+                        <div className="grid grid-cols-4 items-center gap-4">
                           <Input
                             id="bulk-intakeMonths"
                             value={currentProgram.intakeMonths}
                             onChange={(e) => handleInputChange('intakeMonths', e.target.value)}
+                            className="col-span-3"
                           />
+                          <Label htmlFor="bulk-intakeMonths" className="text-end">أشهر القبول</Label>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="bulk-qualification">المؤهل المطلوب</Label>
+                        <div className="grid grid-cols-4 items-center gap-4">
                           <Input
                             id="bulk-qualification"
                             value={currentProgram.qualification}
                             onChange={(e) => handleInputChange('qualification', e.target.value)}
+                            className="col-span-3"
                           />
+                          <Label htmlFor="bulk-qualification" className="text-end">المؤهل المطلوب</Label>
                         </div>
-                        <div>
-                          <Label htmlFor="bulk-englishRequirement">متطلبات اللغة الإنجليزية</Label>
+                        <div className="grid grid-cols-4 items-center gap-4">
                           <Input
                             id="bulk-englishRequirement"
                             value={currentProgram.englishRequirement}
                             onChange={(e) => handleInputChange('englishRequirement', e.target.value)}
+                            className="col-span-3"
                           />
+                          <Label htmlFor="bulk-englishRequirement" className="text-end">متطلبات اللغة الإنجليزية</Label>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="bulk-classType">نوع الدراسة</Label>
+                        <div className="grid grid-cols-4 items-center gap-4">
                           <Input
                             id="bulk-classType"
                             value={currentProgram.classType}
                             onChange={(e) => handleInputChange('classType', e.target.value)}
+                            className="col-span-3"
                           />
+                          <Label htmlFor="bulk-classType" className="text-end">نوع الدراسة</Label>
                         </div>
-                        <div className="flex items-center space-x-2 pt-6">
-                          <Switch
-                            id="bulk-offerLetter"
-                            checked={currentProgram.offerLetter}
-                            onCheckedChange={(checked) => handleInputChange('offerLetter', checked)}
-                          />
-                          <Label htmlFor="bulk-offerLetter">رسالة قبول</Label>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <div className="col-span-3">
+                            <Switch
+                              id="bulk-offerLetter"
+                              checked={currentProgram.offerLetter}
+                              onCheckedChange={(checked) => handleInputChange('offerLetter', checked)}
+                            />
+                          </div>
+                          <Label htmlFor="bulk-offerLetter" className="text-end">رسالة قبول</Label>
                         </div>
                       </div>
                       <JsonEditor
