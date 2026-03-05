@@ -24,6 +24,38 @@ export default function ProgramsManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentProgram, setCurrentProgram] = useState<Program | null>(null)
 
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>('all')
+  const [selectedUniversityId, setSelectedUniversityId] = useState<string>('all')
+
+  // Get unique departments and universities for filter dropdowns
+  const departmentOptions = departments.map(d => ({ id: d.id, name: d.name, universityName: d.university?.name || '' }))
+  const universityOptions = Array.from(
+    new Map(
+      departments
+        .filter(d => d.university?.id && d.university?.name)
+        .map(d => [d.university!.id, { id: d.university!.id, name: d.university!.name! }])
+    ).values()
+  ).sort((a, b) => a.name.localeCompare(b.name))
+
+  // Filtered programs based on search and filters
+  const filteredPrograms = programs.filter(program => {
+    const matchesSearch = searchQuery === '' || 
+      program.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesDepartment = selectedDepartmentId === 'all' || 
+      program.department?.id.toString() === selectedDepartmentId
+    const matchesUniversity = selectedUniversityId === 'all' || 
+      program.department?.university?.id.toString() === selectedUniversityId
+    return matchesSearch && matchesDepartment && matchesUniversity
+  })
+
+  const clearFilters = () => {
+    setSearchQuery('')
+    setSelectedDepartmentId('all')
+    setSelectedUniversityId('all')
+  }
+
   useEffect(() => {
     fetchData()
   }, [selectedLanguage])
@@ -177,44 +209,110 @@ export default function ProgramsManagement() {
         </div>
       </div>
 
+      {/* Search and Filter Section */}
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex flex-wrap gap-4 items-end">
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="search" className="mb-2 block">البحث بالاسم</Label>
+              <Input
+                id="search"
+                placeholder="ابحث عن برنامج..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="university-filter" className="mb-2 block">تصفية حسب الجامعة</Label>
+              <Select value={selectedUniversityId} onValueChange={setSelectedUniversityId}>
+                <SelectTrigger id="university-filter">
+                  <SelectValue placeholder="اختر جامعة" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">كل الجامعات</SelectItem>
+                  {universityOptions.map((university) => (
+                    <SelectItem key={university.id} value={university.id.toString()}>
+                      {university.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <Label htmlFor="department-filter" className="mb-2 block">تصفية حسب القسم</Label>
+              <Select value={selectedDepartmentId} onValueChange={setSelectedDepartmentId}>
+                <SelectTrigger id="department-filter">
+                  <SelectValue placeholder="اختر قسم" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">كل الأقسام</SelectItem>
+                  {departmentOptions.map((department) => (
+                    <SelectItem key={department.id} value={department.id.toString()}>
+                      {department.name} ({department.universityName})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {(searchQuery !== '' || selectedDepartmentId !== 'all' || selectedUniversityId !== 'all') && (
+              <Button variant="outline" onClick={clearFilters}>
+                مسح الفلاتر
+              </Button>
+            )}
+          </div>
+          {(searchQuery !== '' || selectedDepartmentId !== 'all' || selectedUniversityId !== 'all') && (
+            <p className="text-sm text-muted-foreground mt-3">
+              عرض {filteredPrograms.length} من {programs.length} برنامج
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>قائمة البرامج</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>الاسم</TableHead>
-                <TableHead>القسم</TableHead>
-                <TableHead>المدة</TableHead>
-                <TableHead>الرسوم الدراسية</TableHead>
-                <TableHead>رسالة القبول</TableHead>
+          {filteredPrograms.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {programs.length === 0 ? 'لا توجد برامج متاحة' : 'لا توجد نتائج تطابق البحث'}
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>الاسم</TableHead>
+                  <TableHead>القسم</TableHead>
+                  <TableHead>المدة</TableHead>
+                  <TableHead>الرسوم الدراسية</TableHead>
+                  <TableHead>رسالة القبول</TableHead>
                   <TableHead className="text-start">الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {programs.map((program) => (
-                <TableRow key={program.id}>
-                  <TableCell className="font-medium">{program.name}</TableCell>
-                  <TableCell>{program.department?.name}</TableCell>
-                  <TableCell>{program.duration}</TableCell>
-                  <TableCell>{program.tuitionFees}</TableCell>
-                  <TableCell>{program.offerLetter ? 'نعم' : 'لا'}</TableCell>
-                  <TableCell className="text-start">
-                    <Button variant="outline" size="sm" className="ml-2 rtl:ml-0 rtl:mr-2" onClick={() => handleEdit(program)}>
-                      تعديل
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDelete(program.id)}>
-                      حذف
-                    </Button>
-                  </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredPrograms.map((program) => (
+                  <TableRow key={program.id}>
+                    <TableCell className="font-medium">{program.name}</TableCell>
+                    <TableCell>{program.department?.name}</TableCell>
+                    <TableCell>{program.duration}</TableCell>
+                    <TableCell>{program.tuitionFees}</TableCell>
+                    <TableCell>{program.offerLetter ? 'نعم' : 'لا'}</TableCell>
+                    <TableCell className="text-start">
+                      <Button variant="outline" size="sm" className="ml-2 rtl:ml-0 rtl:mr-2" onClick={() => handleEdit(program)}>
+                        تعديل
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => handleDelete(program.id)}>
+                        حذف
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
+
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent dir="rtl" className="max-w-2xl max-h-[80vh] overflow-y-auto">
