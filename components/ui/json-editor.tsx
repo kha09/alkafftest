@@ -51,9 +51,6 @@ export function JsonEditor({ label, value, onChange, placeholder, requiredFields
 
   return (
     <div className="grid grid-cols-4 items-start gap-4">
-      <Label htmlFor={label} className="text-right pt-2">
-        {label}
-      </Label>
       <div className="col-span-3">
         <Textarea
           id={label}
@@ -73,6 +70,9 @@ export function JsonEditor({ label, value, onChange, placeholder, requiredFields
           </p>
         )}
       </div>
+      <Label htmlFor={label} className="text-end pt-2">
+        {label}
+      </Label>
     </div>
   )
 }
