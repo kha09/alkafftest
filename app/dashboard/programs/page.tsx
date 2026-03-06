@@ -670,17 +670,17 @@ export default function ProgramsManagement() {
                       <CardTitle className="text-lg">اختيار الجامعات والأقسام</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div>
-                        <Label>الجامعات</Label>
+                      <div className="grid grid-cols-4 items-center gap-4">
                         <MultiSelect
                           options={universityOptions.map(u => ({ value: u.id.toString(), label: u.name }))}
                           selected={selectedUniversityIds}
                           onChange={setSelectedUniversityIds}
                           placeholder="اختر الجامعات..."
+                          className="col-span-3"
                         />
+                        <Label className="text-end">الجامعات</Label>
                       </div>
-                      <div>
-                        <Label>الأقسام</Label>
+                      <div className="grid grid-cols-4 items-center gap-4">
                         <MultiSelect
                           options={departments
                             .filter(d => selectedUniversityIds.length === 0 || selectedUniversityIds.includes(d.university?.id.toString() || ''))
@@ -691,7 +691,9 @@ export default function ProgramsManagement() {
                           selected={selectedDepartmentIds}
                           onChange={setSelectedDepartmentIds}
                           placeholder="اختر الأقسام..."
+                          className="col-span-3"
                         />
+                        <Label className="text-end">الأقسام</Label>
                       </div>
                     </CardContent>
                   </Card>
