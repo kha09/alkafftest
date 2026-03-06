@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { JsonEditor } from '@/components/ui/json-editor'
+import { DynamicFeesEditor } from '@/components/ui/dynamic-fees-editor'
 import { Badge } from '@/components/ui/badge'
 import { MultiSelect, Option } from '@/components/ui/multi-select'
 import { Globe, Plus, Copy } from 'lucide-react'
@@ -515,19 +515,17 @@ export default function ProgramsManagement() {
                       نوع الدراسة
                     </Label>
                   </div>
-                  <JsonEditor
+                  <DynamicFeesEditor
                     label="الرسوم السنوية"
                     value={currentProgram.yearlyTuitionFees}
-                    onChange={(value) => handleInputChange('yearlyTuitionFees', value)}
-                    placeholder='[{"year": "1st Year", "fee": "USD 5,764"}, {"year": "2nd Year", "fee": "USD 5,764"}]'
-                    requiredFields={['year', 'fee']}
+                    onChange={(value: string) => handleInputChange('yearlyTuitionFees', value)}
+                    type="yearly"
                   />
-                  <JsonEditor
+                  <DynamicFeesEditor
                     label="رسوم أخرى"
                     value={currentProgram.otherFees}
-                    onChange={(value) => handleInputChange('otherFees', value)}
-                    placeholder='[{"description": "International Processing Fee", "fee": "USD 627"}]'
-                    requiredFields={['description', 'fee']}
+                    onChange={(value: string) => handleInputChange('otherFees', value)}
+                    type="other"
                   />
                   <div className="grid grid-cols-4 items-center gap-4">
                     <div className="col-span-3">
@@ -647,19 +645,17 @@ export default function ProgramsManagement() {
                           <Label htmlFor="bulk-offerLetter" className="text-end">رسالة قبول</Label>
                         </div>
                       </div>
-                      <JsonEditor
+                      <DynamicFeesEditor
                         label="الرسوم السنوية"
                         value={currentProgram.yearlyTuitionFees}
-                        onChange={(value) => handleInputChange('yearlyTuitionFees', value)}
-                        placeholder='[{"year": "1st Year", "fee": "USD 5,764"}, {"year": "2nd Year", "fee": "USD 5,764"}]'
-                        requiredFields={['year', 'fee']}
+                        onChange={(value: string) => handleInputChange('yearlyTuitionFees', value)}
+                        type="yearly"
                       />
-                      <JsonEditor
+                      <DynamicFeesEditor
                         label="رسوم أخرى"
                         value={currentProgram.otherFees}
-                        onChange={(value) => handleInputChange('otherFees', value)}
-                        placeholder='[{"description": "International Processing Fee", "fee": "USD 627"}]'
-                        requiredFields={['description', 'fee']}
+                        onChange={(value: string) => handleInputChange('otherFees', value)}
+                        type="other"
                       />
                     </CardContent>
                   </Card>
