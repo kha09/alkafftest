@@ -118,6 +118,8 @@ export default function StudentsPage() {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [submissionToDelete, setSubmissionToDelete] = useState<FormSubmission | null>(null)
+  const [passwordResetDialogOpen, setPasswordResetDialogOpen] = useState(false)
+  const [submissionForPasswordReset, setSubmissionForPasswordReset] = useState<FormSubmission | null>(null)
 
   useEffect(() => {
     fetchAgents()
@@ -483,6 +485,35 @@ export default function StudentsPage() {
     }
   }
 
+  const handleConfirmPasswordReset = async () => {
+    if (!submissionForPasswordReset) return
+
+    try {
+      const response = await fetch(`/api/admin/form-submissions/${submissionForPasswordReset.id}/reset-password`, {
+        method: 'POST'
+      });
+      const data = await response.json();
+      if (response.ok) {
+        // Show password in alert
+        window.alert(`كلمة المرور الجديدة: ${data.newPassword}`);
+        setPasswordResetDialogOpen(false)
+        setSubmissionForPasswordReset(null)
+      } else {
+        toast({
+          title: "خطأ",
+          description: data.error || "حدث خطأ أثناء إعادة تعيين كلمة المرور",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء إعادة تعيين كلمة المرور",
+        variant: "destructive",
+      });
+    }
+  }
+
   if (loading) {
     return (
       <div className="p-6 space-y-6">
@@ -703,29 +734,9 @@ export default function StudentsPage() {
                               <Button 
                                 variant="outline" 
                                 size="sm"
-                                onClick={async () => {
-                                  try {
-                                    const response = await fetch(`/api/admin/form-submissions/${submission.id}/reset-password`, {
-                                      method: 'POST'
-                                    });
-                                    const data = await response.json();
-                                    if (response.ok) {
-                                      // Show password in a dialog/modal
-                                      window.alert(`كلمة المرور الجديدة: ${data.newPassword}`);
-                                    } else {
-                                      toast({
-                                        title: "خطأ",
-                                        description: data.error || "حدث خطأ أثناء إعادة تعيين كلمة المرور",
-                                        variant: "destructive",
-                                      });
-                                    }
-                                  } catch (error) {
-                                    toast({
-                                      title: "خطأ",
-                                      description: "حدث خطأ أثناء إعادة تعيين كلمة المرور",
-                                      variant: "destructive",
-                                    });
-                                  }
+                                onClick={() => {
+                                  setSubmissionForPasswordReset(submission)
+                                  setPasswordResetDialogOpen(true)
                                 }}
                               >
                                 <Key className="w-4 h-4" />
@@ -1196,6 +1207,26 @@ export default function StudentsPage() {
               className="bg-red-600 hover:bg-red-700"
             >
               حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Password Reset Confirmation Dialog */}
+      <AlertDialog open={passwordResetDialogOpen} onOpenChange={setPasswordResetDialogOpen}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد إعادة تعيين كلمة المرور</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل أنت متأكد من أنك تريد إعادة تعيين كلمة المرور للطالب "{submissionForPasswordReset?.fullName}"؟ سيتم إنشاء كلمة مرور جديدة عشوائية.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmPasswordReset}
+            >
+              تأكيد
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
