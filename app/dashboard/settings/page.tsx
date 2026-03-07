@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import { User, Bell, Shield, Palette, Database, Mail, Save, MessageCircle } from "lucide-react"
+import { User, Bell, Shield, Palette, Database, Mail, Save, MessageCircle, Loader2, CheckCircle, XCircle } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
 
@@ -21,6 +21,22 @@ interface WhatsAppSettings {
   welcomeMessage: string
 }
 
+interface SmtpSettings {
+  id: number | null
+  host: string
+  port: number
+  username: string
+  password: string
+  encryption: string
+  fromEmail: string
+  fromName: string
+  isEnabled: boolean
+  testEmail: string
+  lastTested: string | null
+  testStatus: string | null
+  testError: string | null
+}
+
 export default function SettingsPage() {
   const [whatsappSettings, setWhatsappSettings] = useState<WhatsAppSettings>({
     phoneNumber: '',
@@ -29,12 +45,33 @@ export default function SettingsPage() {
     position: 'bottom-right',
     welcomeMessage: 'مرحباً! كيف يمكنني مساعدتك؟'
   })
+  
+  // SMTP Settings State
+  const [smtpSettings, setSmtpSettings] = useState<SmtpSettings>({
+    id: null,
+    host: '',
+    port: 587,
+    username: '',
+    password: '',
+    encryption: 'tls',
+    fromEmail: '',
+    fromName: 'SM Alkaff',
+    isEnabled: true,
+    testEmail: '',
+    lastTested: null,
+    testStatus: null,
+    testError: null
+  })
+  
   const [isLoading, setIsLoading] = useState(false)
+  const [isTesting, setIsTesting] = useState(false)
+  const [isSmtpLoading, setIsSmtpLoading] = useState(false)
   const { toast } = useToast()
 
-  // Load WhatsApp settings on component mount
+  // Load WhatsApp and SMTP settings on component mount
   useEffect(() => {
     fetchWhatsAppSettings()
+    fetchSmtpSettings()
   }, [])
 
   const fetchWhatsAppSettings = async () => {
@@ -46,6 +83,21 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Error fetching WhatsApp settings:', error)
+    }
+  }
+
+  const fetchSmtpSettings = async () => {
+    try {
+      const response = await fetch('/api/admin/smtp-settings')
+      if (response.ok) {
+        const data = await response.json()
+        setSmtpSettings({
+          ...data,
+          password: '' // Don't show password
+        })
+      }
+    } catch (error) {
+      console.error('Error fetching SMTP settings:', error)
     }
   }
 
@@ -81,6 +133,95 @@ export default function SettingsPage() {
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const saveSmtpSettings = async () => {
+    setIsSmtpLoading(true)
+    try {
+      const response = await fetch('/api/admin/smtp-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(smtpSettings),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({
+          title: "تم الحفظ بنجاح",
+          description: "تم حفظ إعدادات SMTP بنجاح",
+        })
+        // Refresh settings to get updated status
+        fetchSmtpSettings()
+      } else {
+        toast({
+          title: "خطأ في الحفظ",
+          description: data.error || "حدث خطأ أثناء حفظ الإعدادات",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "خطأ في الحفظ",
+        description: "حدث خطأ أثناء حفظ الإعدادات",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSmtpLoading(false)
+    }
+  }
+
+  const testSmtpConnection = async () => {
+    if (!smtpSettings.testEmail) {
+      toast({
+        title: "مطلوب",
+        description: "الرجاء إدخال البريد الإلكتروني للاختبار",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsTesting(true)
+    try {
+      const response = await fetch('/api/admin/smtp-settings/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...smtpSettings,
+          useStoredSettings: true,
+          testEmail: smtpSettings.testEmail
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        toast({
+          title: "نجاح",
+          description: "تم إرسال البريد التجريبي بنجاح",
+        })
+        // Refresh settings to get updated test status
+        fetchSmtpSettings()
+      } else {
+        toast({
+          title: "فشل الاختبار",
+          description: data.error || data.details || "حدث خطأ أثناء اختبار الاتصال",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "خطأ في الاتصال",
+        description: "حدث خطأ أثناء محاولة الاتصال بخادم SMTP",
+        variant: "destructive",
+      })
+    } finally {
+      setIsTesting(false)
     }
   }
   return (
@@ -369,16 +510,30 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="smtpHost">خادم SMTP</Label>
-                  <Input id="smtpHost" placeholder="smtp.gmail.com" />
+                  <Input 
+                    id="smtpHost" 
+                    placeholder="smtp.gmail.com"
+                    value={smtpSettings.host}
+                    onChange={(e) => setSmtpSettings(prev => ({ ...prev, host: e.target.value }))}
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="smtpPort">المنفذ</Label>
-                    <Input id="smtpPort" type="number" placeholder="587" />
+                    <Input 
+                      id="smtpPort" 
+                      type="number" 
+                      placeholder="587"
+                      value={smtpSettings.port || ''}
+                      onChange={(e) => setSmtpSettings(prev => ({ ...prev, port: parseInt(e.target.value) || 587 }))}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="smtpEncryption">التشفير</Label>
-                    <Select defaultValue="tls">
+                    <Select 
+                      value={smtpSettings.encryption}
+                      onValueChange={(value) => setSmtpSettings(prev => ({ ...prev, encryption: value }))}
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -392,28 +547,65 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <Label htmlFor="smtpUsername">اسم المستخدم</Label>
-                  <Input id="smtpUsername" placeholder="your-email@gmail.com" />
+                  <Input 
+                    id="smtpUsername" 
+                    placeholder="your-email@gmail.com"
+                    value={smtpSettings.username}
+                    onChange={(e) => setSmtpSettings(prev => ({ ...prev, username: e.target.value }))}
+                  />
                 </div>
                 <div>
                   <Label htmlFor="smtpPassword">كلمة المرور</Label>
-                  <Input id="smtpPassword" type="password" placeholder="كلمة مرور التطبيق" />
+                  <Input 
+                    id="smtpPassword" 
+                    type="password" 
+                    placeholder="كلمة مرور التطبيق"
+                    value={smtpSettings.password}
+                    onChange={(e) => setSmtpSettings(prev => ({ ...prev, password: e.target.value }))}
+                  />
+                  <p className="text-xs text-[#4b5563] mt-1">اتركها فارغة إذا لا تريد تغيير كلمة المرور</p>
                 </div>
                 <div>
                   <Label htmlFor="fromEmail">البريد المرسل</Label>
-                  <Input id="fromEmail" placeholder="no-reply@smalkaff.com" />
+                  <Input 
+                    id="fromEmail" 
+                    placeholder="no-reply@smalkaff.com"
+                    value={smtpSettings.fromEmail}
+                    onChange={(e) => setSmtpSettings(prev => ({ ...prev, fromEmail: e.target.value }))}
+                  />
                 </div>
                 <div>
                   <Label htmlFor="fromName">اسم المرسل</Label>
-                  <Input id="fromName" defaultValue="SM Alkaff" />
+                  <Input 
+                    id="fromName" 
+                    value={smtpSettings.fromName}
+                    onChange={(e) => setSmtpSettings(prev => ({ ...prev, fromName: e.target.value }))}
+                  />
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium text-[#111827]">تفعيل SMTP</h4>
                     <p className="text-sm text-[#4b5563]">تمكين إرسال البريد الإلكتروني</p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch 
+                    checked={smtpSettings.isEnabled}
+                    onCheckedChange={(checked) => setSmtpSettings(prev => ({ ...prev, isEnabled: checked }))}
+                  />
                 </div>
-                <Button className="w-full">حفظ إعدادات SMTP</Button>
+                <Button 
+                  className="w-full"
+                  onClick={saveSmtpSettings}
+                  disabled={isSmtpLoading}
+                >
+                  {isSmtpLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                      جاري الحفظ...
+                    </>
+                  ) : (
+                    "حفظ إعدادات SMTP"
+                  )}
+                </Button>
               </CardContent>
             </Card>
 
@@ -424,17 +616,61 @@ export default function SettingsPage() {
               <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="testEmail">البريد الإلكتروني للاختبار</Label>
-                  <Input id="testEmail" type="email" placeholder="test@example.com" />
+                  <Input 
+                    id="testEmail" 
+                    type="email" 
+                    placeholder="test@example.com"
+                    value={smtpSettings.testEmail || ''}
+                    onChange={(e) => setSmtpSettings(prev => ({ ...prev, testEmail: e.target.value }))}
+                  />
                 </div>
-                <Button variant="outline" className="w-full">إرسال بريد تجريبي</Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={testSmtpConnection}
+                  disabled={isTesting}
+                >
+                  {isTesting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                      جاري الإرسال...
+                    </>
+                  ) : (
+                    "إرسال بريد تجريبي"
+                  )}
+                </Button>
                 
                 <div className="mt-6 p-4 bg-[#f3f4f6] rounded-lg">
                   <h4 className="font-medium text-[#111827] mb-2">حالة الاتصال</h4>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <span className="text-sm text-[#4b5563]">غير متصل</span>
+                    {smtpSettings.testStatus === 'success' ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <span className="text-sm text-green-600">متصل بنجاح</span>
+                      </>
+                    ) : smtpSettings.testStatus === 'failed' ? (
+                      <>
+                        <XCircle className="w-4 h-4 text-red-500" />
+                        <span className="text-sm text-red-600">فشل الاتصال</span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                        <span className="text-sm text-[#4b5563]">غير مختبَر</span>
+                      </>
+                    )}
                   </div>
-                  <p className="text-xs text-[#4b5563] mt-1">لم يتم اختبار الإعدادات بعد</p>
+                  {smtpSettings.lastTested && (
+                    <p className="text-xs text-[#4b5563] mt-1">
+                      آخر اختبار: {new Date(smtpSettings.lastTested).toLocaleString('ar')}
+                    </p>
+                  )}
+                  {smtpSettings.testError && smtpSettings.testStatus === 'failed' && (
+                    <p className="text-xs text-red-500 mt-1">{smtpSettings.testError}</p>
+                  )}
+                  {!smtpSettings.testStatus && (
+                    <p className="text-xs text-[#4b5563] mt-1">لم يتم اختبار الإعدادات بعد</p>
+                  )}
                 </div>
 
                 <div className="mt-4">
