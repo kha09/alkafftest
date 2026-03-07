@@ -448,6 +448,12 @@ export default function StudentsPage() {
           description: "يرجى إدخال بريد إلكتروني صحيح للجامعة في حقل 'بريد الجامعة' أو التأكد من أن الجامعة مسجلة لديها بريد إلكتروني في النظام",
           variant: "destructive",
         })
+      } else if (error.message && error.message.includes('No SMTP configuration found')) {
+        toast({
+          title: "خطأ في إعدادات البريد الإلكتروني",
+          description: "يرجى إعداد إعدادات SMTP في لوحة التحكم لإرسال رسائل البريد الإلكتروني",
+          variant: "destructive",
+        })
       } else {
         toast({
           title: "خطأ",
