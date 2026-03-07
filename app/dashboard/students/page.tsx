@@ -392,6 +392,17 @@ export default function StudentsPage() {
       }
     }
 
+    // Client-side validation: Check if university email is provided
+    // If not, check if the submission has a university with an email
+    if (!universityEmail && !selectedSubmission.universityId) {
+      toast({
+        title: "خطأ في البريد الإلكتروني للجامعة",
+        description: "يرجى إدخال بريد إلكتروني للجامعة في حقل 'بريد الجامعة' أو التأكد من أن الطالب مرتبط بجامعة مسجلة في النظام",
+        variant: "destructive",
+      })
+      return
+    }
+
     try {
       const requestBody: any = {
         submissionId: selectedSubmission.id,
@@ -429,11 +440,21 @@ export default function StudentsPage() {
       }
     } catch (error: any) {
       console.error('Error sending email:', error)
-      toast({
-        title: "خطأ",
-        description: error.message || "حدث خطأ أثناء إرسال البريد الإلكتروني",
-        variant: "destructive",
-      })
+      
+      // Check for specific university email error and provide better user message
+      if (error.message && error.message.includes('University email address is required')) {
+        toast({
+          title: "خطأ في البريد الإلكتروني للجامعة",
+          description: "يرجى إدخال بريد إلكتروني صحيح للجامعة في حقل 'بريد الجامعة' أو التأكد من أن الجامعة مسجلة لديها بريد إلكتروني في النظام",
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "خطأ",
+          description: error.message || "حدث خطأ أثناء إرسال البريد الإلكتروني",
+          variant: "destructive",
+        })
+      }
     }
   }
 
@@ -718,8 +739,6 @@ export default function StudentsPage() {
                 {submissions && submissions.length > 0 ? (
                   submissions.map((submission) => (
                     <tr key={submission.id} className="border-b border-[#f3f4f6] hover:bg-[#f9fafb]">
-                      {/* ... unchanged row rendering ... */}
-                      {/* (keep the rest of the row code as is) */}
                       <td className="p-3">
                         <div className="flex items-center gap-2">
                           {submission.user ? (
