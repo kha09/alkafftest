@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/db'
 import { uploadFileToS3, validateS3Config } from '@/lib/s3Client'
 import { createNotification } from '@/lib/notificationService'
+import { sendEmail } from '@/lib/emailService'
 
 export async function POST(request: NextRequest) {
   try {
@@ -108,6 +109,97 @@ export async function POST(request: NextRequest) {
     } catch (notificationError) {
       console.error('Failed to create notification:', notificationError)
       // Don't fail the whole request if notification creation fails
+    }
+
+    // Send email notification to all admin users
+    try {
+      const adminUsers = await prisma.user.findMany({
+        where: { role: 'admin' },
+        select: { email: true, fullName: true }
+      })
+
+      if (adminUsers.length > 0) {
+        const submissionDate = new Date().toLocaleString('ar-SA', {
+          timeZone: 'Asia/Riyadh',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+
+        const emailSubject = `طلب جديد مقدم - ${fullName}`
+        const emailText = `تم استلام طلب تسجيل جديد
+
+تفاصيل الطالب:
+- الاسم الكامل: ${fullName}
+- البريد الإلكتروني: ${email}
+- الجنسية: ${nationality}
+- بلد الإقامة: ${countryOfResidence}
+- مدينة الإقامة: ${cityOfResidence}
+- رقم الاتصال: ${contactNumber}
+- التخصص المفضل: ${preferredProgram}
+- تاريخ التقديم: ${submissionDate}
+
+يمكنك مراجعة الطلب من خلال لوحة التحكم.`
+
+        const emailHtml = `
+<div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+  <h2 style="color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">طلب جديد مقدم</h2>
+  <p style="color: #4b5563;">تم استلام طلب تسجيل جديد بالتفاصيل التالية:</p>
+  <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+    <tr style="background-color: #f9fafb;">
+      <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold; width: 40%;">الاسم الكامل</td>
+      <td style="padding: 10px; border: 1px solid #e5e7eb;">${fullName}</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">البريد الإلكتروني</td>
+      <td style="padding: 10px; border: 1px solid #e5e7eb;">${email}</td>
+    </tr>
+    <tr style="background-color: #f9fafb;">
+      <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">الجنسية</td>
+      <td style="padding: 10px; border: 1px solid #e5e7eb;">${nationality}</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">بلد الإقامة</td>
+      <td style="padding: 10px; border: 1px solid #e5e7eb;">${countryOfResidence}</td>
+    </tr>
+    <tr style="background-color: #f9fafb;">
+      <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">مدينة الإقامة</td>
+      <td style="padding: 10px; border: 1px solid #e5e7eb;">${cityOfResidence}</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">رقم الاتصال</td>
+      <td style="padding: 10px; border: 1px solid #e5e7eb;">${contactNumber}</td>
+    </tr>
+    <tr style="background-color: #f9fafb;">
+      <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">التخصص المفضل</td>
+      <td style="padding: 10px; border: 1px solid #e5e7eb;">${preferredProgram}</td>
+    </tr>
+    <tr>
+      <td style="padding: 10px; border: 1px solid #e5e7eb; font-weight: bold;">تاريخ التقديم</td>
+      <td style="padding: 10px; border: 1px solid #e5e7eb;">${submissionDate}</td>
+    </tr>
+  </table>
+  <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">يمكنك مراجعة الطلب من خلال لوحة التحكم.</p>
+</div>`
+
+        for (const admin of adminUsers) {
+          try {
+            await sendEmail({
+              to: admin.email,
+              subject: emailSubject,
+              text: emailText,
+              html: emailHtml
+            })
+          } catch (adminEmailError) {
+            console.error(`Failed to send email to admin ${admin.email}:`, adminEmailError)
+          }
+        }
+      }
+    } catch (emailError) {
+      console.error('Failed to send admin email notifications:', emailError)
+      // Don't fail the whole request if email sending fails
     }
     
     return NextResponse.json(completeFormSubmission, { status: 201 })
