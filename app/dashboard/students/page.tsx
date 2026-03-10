@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { Search, Plus, Download, Filter, Eye, Edit, Trash2, Send, Key, User } from "lucide-react"
+import { Search, Plus, Download, Filter, Eye, Edit, Trash2, Send, Key, User, Paperclip, ExternalLink } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -1191,15 +1191,45 @@ export default function StudentsPage() {
                 </div>
               )}
 
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="includeAttachments"
-                  checked={includeAttachments}
-                  onChange={(e) => setIncludeAttachments(e.target.checked)}
-                  className="rounded"
-                />
-                <Label htmlFor="includeAttachments">إرفاق ملفات الطالب</Label>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="includeAttachments"
+                    checked={includeAttachments}
+                    onChange={(e) => setIncludeAttachments(e.target.checked)}
+                    className="rounded"
+                  />
+                  <Label htmlFor="includeAttachments">إرفاق ملفات الطالب</Label>
+                </div>
+
+                {/* File preview list */}
+                {selectedSubmission.uploadedFiles && selectedSubmission.uploadedFiles.length > 0 ? (
+                  <div className={`rounded border p-3 space-y-1 transition-opacity ${includeAttachments ? 'opacity-100' : 'opacity-50'}`}>
+                    <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                      <Paperclip className="w-3 h-3" />
+                      {includeAttachments ? 'الملفات التي سيتم إرفاقها:' : 'ملفات الطالب (لن يتم إرفاقها):'}
+                    </p>
+                    {selectedSubmission.uploadedFiles.map((file) => (
+                      <div key={file.id} className="flex items-center justify-between gap-2 text-sm py-1 border-b last:border-0">
+                        <span className="truncate text-muted-foreground flex-1" title={file.originalName}>
+                          {file.originalName}
+                        </span>
+                        <a
+                          href={`/api/files/${file.path}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 shrink-0"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          عرض
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground pr-5">لا توجد ملفات مرفوعة لهذا الطالب</p>
+                )}
               </div>
 
               <div className="flex justify-end gap-3">
