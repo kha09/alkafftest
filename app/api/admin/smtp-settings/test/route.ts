@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import db from '@/lib/db'
 import nodemailer from 'nodemailer'
-import bcrypt from 'bcrypt'
 
 // POST - Test SMTP connection and send test email
 export async function POST(request: NextRequest) {
@@ -41,14 +40,12 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Decrypt password
-      const decryptedPassword = settings.password // In production, you'd decrypt this
-
+      // Use stored password directly (stored as plain text for nodemailer)
       smtpConfig = {
         host: settings.host,
         port: settings.port,
         username: settings.username,
-        password: decryptedPassword,
+        password: settings.password,
         encryption: settings.encryption,
         fromEmail: settings.fromEmail,
         fromName: settings.fromName,

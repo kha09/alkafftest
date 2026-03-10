@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import db from '@/lib/db'
-import bcrypt from 'bcrypt'
 
 // GET - Retrieve current SMTP settings
 export async function GET() {
@@ -85,11 +84,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Hash password if provided
-    let hashedPassword = ''
-    if (password && password.trim() !== '') {
-      hashedPassword = await bcrypt.hash(password, 10)
-    }
+    // Store password as-is (not hashed) - nodemailer needs the raw password
+    const rawPassword = password
 
     // Check if settings already exist
     const existingSettings = await db.smtpSettings.findFirst({
@@ -112,8 +108,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Only update password if a new one is provided
-      if (hashedPassword) {
-        updateData.password = hashedPassword
+      if (rawPassword && rawPassword.trim() !== '') {
+        updateData.password = rawPassword
       }
 
       settings = await db.smtpSettings.update({
@@ -122,7 +118,7 @@ export async function POST(request: NextRequest) {
       })
     } else {
       // Create new settings
-      if (!hashedPassword) {
+      if (!rawPassword || rawPassword.trim() === '') {
         return NextResponse.json(
           { error: 'Password is required for new SMTP configuration' },
           { status: 400 }
@@ -134,7 +130,7 @@ export async function POST(request: NextRequest) {
           host,
           port: parseInt(port),
           username,
-          password: hashedPassword,
+          password: rawPassword,
           encryption: encryption || 'tls',
           fromEmail,
           fromName: fromName || 'SM Alkaff',

@@ -1,6 +1,5 @@
 import db from '@/lib/db'
 import nodemailer from 'nodemailer'
-import bcrypt from 'bcrypt'
 
 export interface SmtpConfig {
   host: string
