@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Switch } from '@/components/ui/switch'
-import { Plus, Edit, Trash2, Mail, Eye, FileText, Send, Filter } from 'lucide-react'
+import { Plus, Edit, Trash2, Mail, Eye, FileText, Send, Filter, AlignRight, AlignLeft, Wand2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface EmailTemplate {
@@ -29,6 +29,8 @@ interface EmailTemplate {
   }
 }
 
+type TextDirection = 'auto' | 'rtl' | 'ltr'
+
 export default function EmailTemplatesPage() {
   const [templates, setTemplates] = useState<EmailTemplate[]>([])
   const [loading, setLoading] = useState(true)
@@ -44,6 +46,10 @@ export default function EmailTemplatesPage() {
     description: '',
     isActive: true
   })
+  const [bodyDirection, setBodyDirection] = useState<TextDirection>('auto')
+  const [editBodyDirection, setEditBodyDirection] = useState<TextDirection>('auto')
+  const createBodyRef = useRef<HTMLTextAreaElement>(null)
+  const editBodyRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     fetchTemplates()
@@ -151,6 +157,8 @@ export default function EmailTemplatesPage() {
       isActive: true
     })
     setSelectedTemplate(null)
+    setBodyDirection('auto')
+    setEditBodyDirection('auto')
   }
 
   const openEditDialog = (template: EmailTemplate) => {
@@ -163,12 +171,52 @@ export default function EmailTemplatesPage() {
       description: template.description || '',
       isActive: template.isActive
     })
+    setEditBodyDirection('auto')
     setIsEditDialogOpen(true)
   }
 
   const openViewDialog = (template: EmailTemplate) => {
     setSelectedTemplate(template)
     setIsViewDialogOpen(true)
+  }
+
+  // Detect text direction based on first strong character
+  const detectDirection = (text: string): 'rtl' | 'ltr' => {
+    const rtlRegex = /[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC]/
+    const ltrRegex = /[A-Za-z]/
+    
+    for (let i = 0; i < text.length; i++) {
+      if (rtlRegex.test(text[i])) return 'rtl'
+      if (ltrRegex.test(text[i])) return 'ltr'
+    }
+    return 'ltr' // default
+  }
+
+  const getEffectiveDirection = (text: string, directionSetting: TextDirection): 'rtl' | 'ltr' => {
+    if (directionSetting === 'auto') {
+      return detectDirection(text)
+    }
+    return directionSetting
+  }
+
+  const insertVariableAtCursor = (variable: string, textareaRef: React.RefObject<HTMLTextAreaElement>) => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const currentValue = textarea.value
+    const newValue = currentValue.substring(0, start) + variable + currentValue.substring(end)
+    
+    // Update form data
+    setFormData({ ...formData, body: newValue })
+    
+    // Restore focus and cursor position
+    setTimeout(() => {
+      textarea.focus()
+      const newCursorPos = start + variable.length
+      textarea.setSelectionRange(newCursorPos, newCursorPos)
+    }, 0)
   }
 
   const templateVariables = [
@@ -264,14 +312,54 @@ export default function EmailTemplatesPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="body">محتوى البريد الإلكتروني</Label>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label htmlFor="body">محتوى البريد الإلكتروني</Label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Wand2 className="w-3 h-3" />
+                        {bodyDirection === 'auto' ? `تلقائي → ${getEffectiveDirection(formData.body, bodyDirection) === 'rtl' ? 'RTL' : 'LTR'}` : bodyDirection.toUpperCase()}
+                      </span>
+                      <div className="flex gap-1 border rounded-md p-1">
+                        <Button
+                          type="button"
+                          variant={bodyDirection === 'auto' ? 'default' : 'ghost'}
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => setBodyDirection('auto')}
+                        >
+                          تلقائي
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={bodyDirection === 'rtl' ? 'default' : 'ghost'}
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => setBodyDirection('rtl')}
+                        >
+                          <AlignRight className="w-3 h-3" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={bodyDirection === 'ltr' ? 'default' : 'ghost'}
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={() => setBodyDirection('ltr')}
+                        >
+                          <AlignLeft className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                   <Textarea
+                    ref={createBodyRef}
                     id="body"
                     value={formData.body}
                     onChange={(e) => setFormData({ ...formData, body: e.target.value })}
                     rows={10}
                     placeholder="اكتب محتوى البريد الإلكتروني هنا..."
                     required
+                    dir={getEffectiveDirection(formData.body, bodyDirection)}
+                    className={getEffectiveDirection(formData.body, bodyDirection) === 'rtl' ? 'text-right' : 'text-left'}
                   />
                   <div className="mt-2">
                     <p className="text-sm text-muted-foreground mb-2">المتغيرات المتاحة:</p>
@@ -280,20 +368,26 @@ export default function EmailTemplatesPage() {
                         <Badge
                           key={variable}
                           variant="secondary"
-                          className="cursor-pointer text-xs"
-                          onClick={() => {
-                            const textarea = document.getElementById('body') as HTMLTextAreaElement
-                            const start = textarea.selectionStart
-                            const end = textarea.selectionEnd
-                            const newValue = formData.body.substring(0, start) + variable + formData.body.substring(end)
-                            setFormData({ ...formData, body: newValue })
-                          }}
+                          className="cursor-pointer text-xs hover:bg-primary hover:text-primary-foreground transition-colors"
+                          onClick={() => insertVariableAtCursor(variable, createBodyRef)}
                         >
                           {variable}
                         </Badge>
                       ))}
                     </div>
                   </div>
+                  {formData.body && (
+                    <div className="mt-3 p-3 bg-muted rounded-md border">
+                      <p className="text-xs text-muted-foreground mb-2 font-medium">معاينة:</p>
+                      <div 
+                        className="text-sm whitespace-pre-wrap"
+                        dir={getEffectiveDirection(formData.body, bodyDirection)}
+                        style={{ textAlign: getEffectiveDirection(formData.body, bodyDirection) === 'rtl' ? 'right' : 'left' }}
+                      >
+                        {formData.body}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -584,13 +678,53 @@ export default function EmailTemplatesPage() {
             </div>
 
             <div>
-              <Label htmlFor="edit-body">محتوى البريد الإلكتروني</Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label htmlFor="edit-body">محتوى البريد الإلكتروني</Label>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Wand2 className="w-3 h-3" />
+                    {editBodyDirection === 'auto' ? `تلقائي → ${getEffectiveDirection(formData.body, editBodyDirection) === 'rtl' ? 'RTL' : 'LTR'}` : editBodyDirection.toUpperCase()}
+                  </span>
+                  <div className="flex gap-1 border rounded-md p-1">
+                    <Button
+                      type="button"
+                      variant={editBodyDirection === 'auto' ? 'default' : 'ghost'}
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => setEditBodyDirection('auto')}
+                    >
+                      تلقائي
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={editBodyDirection === 'rtl' ? 'default' : 'ghost'}
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => setEditBodyDirection('rtl')}
+                    >
+                      <AlignRight className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={editBodyDirection === 'ltr' ? 'default' : 'ghost'}
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => setEditBodyDirection('ltr')}
+                    >
+                      <AlignLeft className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
               <Textarea
+                ref={editBodyRef}
                 id="edit-body"
                 value={formData.body}
                 onChange={(e) => setFormData({ ...formData, body: e.target.value })}
                 rows={10}
                 required
+                dir={getEffectiveDirection(formData.body, editBodyDirection)}
+                className={getEffectiveDirection(formData.body, editBodyDirection) === 'rtl' ? 'text-right' : 'text-left'}
               />
               <div className="mt-2">
                 <p className="text-sm text-muted-foreground mb-2">المتغيرات المتاحة:</p>
@@ -599,20 +733,26 @@ export default function EmailTemplatesPage() {
                     <Badge
                       key={variable}
                       variant="secondary"
-                      className="cursor-pointer text-xs"
-                      onClick={() => {
-                        const textarea = document.getElementById('edit-body') as HTMLTextAreaElement
-                        const start = textarea.selectionStart
-                        const end = textarea.selectionEnd
-                        const newValue = formData.body.substring(0, start) + variable + formData.body.substring(end)
-                        setFormData({ ...formData, body: newValue })
-                      }}
+                      className="cursor-pointer text-xs hover:bg-primary hover:text-primary-foreground transition-colors"
+                      onClick={() => insertVariableAtCursor(variable, editBodyRef)}
                     >
                       {variable}
                     </Badge>
                   ))}
                 </div>
               </div>
+              {formData.body && (
+                <div className="mt-3 p-3 bg-muted rounded-md border">
+                  <p className="text-xs text-muted-foreground mb-2 font-medium">معاينة:</p>
+                  <div 
+                    className="text-sm whitespace-pre-wrap"
+                    dir={getEffectiveDirection(formData.body, editBodyDirection)}
+                    style={{ textAlign: getEffectiveDirection(formData.body, editBodyDirection) === 'rtl' ? 'right' : 'left' }}
+                  >
+                    {formData.body}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center space-x-2">
