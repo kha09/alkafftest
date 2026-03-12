@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import db from '@/lib/db'
+import { sendEmail } from '@/lib/emailService'
 
 // GET - List sent notes with filtering and pagination
 export async function GET(request: NextRequest) {
@@ -222,6 +223,61 @@ export async function POST(request: NextRequest) {
         }
       }
     })
+
+    // Send email notifications to student recipients (non-blocking)
+    try {
+      let studentEmails: { email: string; fullName: string }[] = []
+
+      if (recipientType === 'students') {
+        // All students in the recipient list
+        const users = await db.user.findMany({
+          where: { id: { in: recipientIds }, role: 'student' },
+          select: { email: true, fullName: true }
+        })
+        studentEmails = users
+      } else if (recipientType === 'individual') {
+        // Individual recipients — only include those who are students
+        const users = await db.user.findMany({
+          where: { id: { in: recipientIds }, role: 'student' },
+          select: { email: true, fullName: true }
+        })
+        studentEmails = users
+      }
+      // 'agents' and 'all' types: skip email for now (agents use a different flow)
+
+      const priorityLabels: Record<string, string> = {
+        low: 'منخفض',
+        normal: 'عادي',
+        high: 'عالي',
+        urgent: 'عاجل'
+      }
+      const priorityLabel = priorityLabels[sentNote.priority] || sentNote.priority
+
+      for (const recipient of studentEmails) {
+        try {
+          await sendEmail({
+            to: recipient.email,
+            subject: 'إشعار جديد من فريق SM Alkaff',
+            text: `مرحباً ${recipient.fullName}،\n\nلديك إشعار جديد:\n\n${finalContent}\n\nالأولوية: ${priorityLabel}\n\nشكراً،\nفريق SM Alkaff`,
+            html: `<div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #111827;">إشعار جديد</h2>
+              <p>مرحباً ${recipient.fullName}،</p>
+              <p>لديك إشعار جديد من فريق SM Alkaff:</p>
+              <div style="background: #f9fafb; border-right: 4px solid #374151; padding: 16px; margin: 16px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #111827;">${finalContent.replace(/\n/g, '<br>')}</p>
+              </div>
+              <p style="color: #6b7280; font-size: 14px;">الأولوية: <strong>${priorityLabel}</strong></p>
+              <p style="color: #6b7280; font-size: 14px;">يمكنك الاطلاع على جميع إشعاراتك من خلال لوحة التحكم الخاصة بك.</p>
+              <p style="color: #6b7280; font-size: 14px;">شكراً،<br/>فريق SM Alkaff</p>
+            </div>`
+          })
+        } catch (singleEmailError) {
+          console.error(`Failed to send note email to ${recipient.email}:`, singleEmailError)
+        }
+      }
+    } catch (emailError) {
+      console.error('Note email notification error:', emailError)
+    }
 
     return NextResponse.json({
       ...sentNote,

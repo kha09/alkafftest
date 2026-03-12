@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { createNotification } from '@/lib/notificationService'
+import { sendEmail } from '@/lib/emailService'
 
 // GET /api/support/tickets - List tickets with filtering
 export async function GET(request: NextRequest) {
@@ -210,6 +211,57 @@ export async function POST(request: NextRequest) {
       })
     } catch (notifError) {
       console.error('Support ticket notification error:', notifError)
+    }
+
+    // Create in-app notification (SentNote) for the student who created the ticket (non-blocking)
+    try {
+      const studentUserId = parseInt(session.user.id)
+
+      // Find an admin user to act as sender; fall back to the student's own ID if none exists
+      const adminUser = await prisma.user.findFirst({ where: { role: 'admin' } })
+      const senderUserId = adminUser?.id ?? studentUserId
+
+      await prisma.sentNote.create({
+        data: {
+          content: `تم استلام تذكرة الدعم الخاصة بك رقم #${ticket.id}: "${ticket.title}". سيتم الرد عليك في أقرب وقت ممكن.`,
+          senderId: senderUserId,
+          recipientType: 'individual',
+          recipientIds: JSON.stringify([studentUserId]),
+          priority: 'normal',
+          readStatus: JSON.stringify({})
+        }
+      })
+    } catch (sentNoteError) {
+      console.error('Support ticket student SentNote error:', sentNoteError)
+    }
+
+    // Send confirmation email to the student (non-blocking)
+    try {
+      const studentEmail = ticket.createdBy?.email
+      const studentName = ticket.createdBy?.fullName || 'الطالب'
+
+      if (studentEmail) {
+        await sendEmail({
+          to: studentEmail,
+          subject: `تم استلام تذكرة الدعم #${ticket.id}`,
+          text: `مرحباً ${studentName}،\n\nتم استلام تذكرة الدعم الخاصة بك بنجاح.\n\nرقم التذكرة: #${ticket.id}\nالعنوان: ${ticket.title}\nالأولوية: ${ticket.priority}\n\nسيتم الرد عليك في أقرب وقت ممكن.\n\nشكراً لتواصلك معنا،\nفريق SM Alkaff`,
+          html: `<div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #111827;">تم استلام تذكرة الدعم</h2>
+            <p>مرحباً ${studentName}،</p>
+            <p>تم استلام تذكرة الدعم الخاصة بك بنجاح.</p>
+            <table style="border-collapse: collapse; width: 100%; margin: 16px 0;">
+              <tr><td style="padding: 8px; border: 1px solid #e5e7eb; font-weight: bold;">رقم التذكرة</td><td style="padding: 8px; border: 1px solid #e5e7eb;">#${ticket.id}</td></tr>
+              <tr><td style="padding: 8px; border: 1px solid #e5e7eb; font-weight: bold;">العنوان</td><td style="padding: 8px; border: 1px solid #e5e7eb;">${ticket.title}</td></tr>
+              <tr><td style="padding: 8px; border: 1px solid #e5e7eb; font-weight: bold;">الفئة</td><td style="padding: 8px; border: 1px solid #e5e7eb;">${ticket.category}</td></tr>
+              <tr><td style="padding: 8px; border: 1px solid #e5e7eb; font-weight: bold;">الأولوية</td><td style="padding: 8px; border: 1px solid #e5e7eb;">${ticket.priority}</td></tr>
+            </table>
+            <p>سيتم الرد عليك في أقرب وقت ممكن.</p>
+            <p style="color: #6b7280; font-size: 14px;">شكراً لتواصلك معنا،<br/>فريق SM Alkaff</p>
+          </div>`
+        })
+      }
+    } catch (emailError) {
+      console.error('Support ticket confirmation email error:', emailError)
     }
 
     return NextResponse.json(ticket, { status: 201 })
