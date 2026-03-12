@@ -82,6 +82,7 @@ export interface WhySMAlkaff {
   id: number;
   title: string;
   description: string;
+  useUniversityColor: boolean;
   features: {
     icon: string;
     title: string;

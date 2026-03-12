@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { EnhancedFileUpload } from '@/components/ui/enhanced-file-upload'
 import { CountrySelect } from '@/components/ui/country-select'
-import { ColorPicker } from '@/components/ui/color-picker'
+import { TailwindGradientPicker } from '@/components/ui/tailwind-gradient-picker'
 import { Plus, Trash2, GraduationCap, AlertCircle, Building2, Users, BookOpen, TrendingUp, Award } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
@@ -29,7 +29,7 @@ export default function UniversitiesEditor({ universities, onChange }: Universit
       students: '',
       programs: '',
       acceptance: '',
-      color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      color: 'from-blue-500 to-purple-600',
       flag: '',
       freeOfferLetter: false
     }
@@ -226,23 +226,16 @@ export default function UniversitiesEditor({ universities, onChange }: Universit
                   
                   <div className="space-y-2">
                     <Label>ألوان الجامعة</Label>
-                    <ColorPicker
+                    <TailwindGradientPicker
                       label=""
                       value={university.color}
-                      onChange={(color) => {
-                        // Ensure we always store a gradient string for consistency with homepage
-                        const gradientColor = color.startsWith('linear-gradient') 
-                          ? color 
-                          : `linear-gradient(135deg, ${color} 0%, ${color} 100%)`;
-                        updateUniversity(index, 'color', gradientColor);
-                      }}
-                      placeholder="اختر لون أو تدرج"
+                      onChange={(color) => updateUniversity(index, 'color', color)}
+                      placeholder="اختر تدرج لوني"
                     />
                     <div className="mt-2">
                       <Label className="text-xs text-muted-foreground">معاينة اللون:</Label>
                       <div 
-                        className="w-full h-8 rounded-md mt-1 border"
-                        style={{ background: university.color }}
+                        className={`w-full h-8 rounded-md mt-1 border bg-gradient-to-r ${university.color}`}
                       />
                     </div>
                   </div>

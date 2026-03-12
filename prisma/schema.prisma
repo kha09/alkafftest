@@ -101,11 +101,12 @@ model Faq {
 }
 
 model WhySMAlkaff {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  features    String   // JSON string for features array
-  language    String   @default("ar") // "ar" for Arabic, "en" for English
+  id                Int      @id @default(autoincrement())
+  title             String
+  description       String
+  features          String   // JSON string for features array
+  useUniversityColor Boolean @default(false) // Whether to use university colors
+  language          String   @default("ar") // "ar" for Arabic, "en" for English
 }
 
 model HowItWorks {

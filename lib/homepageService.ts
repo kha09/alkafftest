@@ -87,6 +87,7 @@ export async function getHomepageContent(language: string = 'ar'): Promise<HomeP
         id: whySMAlkaff[0].id,
         title: whySMAlkaff[0].title,
         description: whySMAlkaff[0].description,
+        useUniversityColor: (whySMAlkaff[0] as any).useUniversityColor || false,
         features: whySMAlkaff[0].features ? JSON.parse(whySMAlkaff[0].features) : [],
       } : undefined,
       howItWorks: howItWorks.length > 0 ? {
@@ -120,6 +121,7 @@ export async function updateHomepageContent(content: HomePageContent, language: 
           title: content.whySMAlkaff.title,
           description: content.whySMAlkaff.description,
           features: JSON.stringify(content.whySMAlkaff.features),
+          useUniversityColor: content.whySMAlkaff.useUniversityColor || false,
           language,
         };
 

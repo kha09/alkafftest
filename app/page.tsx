@@ -869,7 +869,13 @@ export default function LandingPage() {
 
           {/* Interactive Features Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8" dir="rtl">
-            {content.whySMAlkaff?.features.map((feature, index) => (
+            {content.whySMAlkaff?.features.map((feature, index) => {
+              // Use university color if enabled, otherwise use feature's own color
+              const displayColor = content.whySMAlkaff?.useUniversityColor 
+                ? (content.universities?.[currentUniversity]?.color || 'from-blue-500 to-purple-500')
+                : feature.color;
+              
+              return (
               <div
                 key={index}
                 className={`group relative animate-fade-in-up`}
@@ -879,12 +885,12 @@ export default function LandingPage() {
                 <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 hover:border-white/40 transition-all duration-500 hover:scale-105 hover:bg-white/15 cursor-pointer h-full">
                   {/* Glow Effect */}
                   <div
-                    className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-20 rounded-3xl transition-opacity duration-500 blur-xl`}
+                    className={`absolute inset-0 bg-gradient-to-r ${displayColor} opacity-0 group-hover:opacity-20 rounded-3xl transition-opacity duration-500 blur-xl`}
                   ></div>
 
                   {/* Stats Badge */}
                   <div
-                    className={`absolute -top-4 -left-4 bg-gradient-to-r ${feature.color} rounded-2xl px-4 py-2 shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                    className={`absolute -top-4 -left-4 bg-gradient-to-r ${displayColor} rounded-2xl px-4 py-2 shadow-lg group-hover:scale-110 transition-transform duration-300`}
                   >
                     <div className="text-white text-sm font-bold">{feature.stats}</div>
                     <div className="text-white/80 text-xs">{feature.statsLabel}</div>
@@ -892,7 +898,7 @@ export default function LandingPage() {
 
                   {/* Icon */}
                   <div
-                    className={`w-20 h-20 bg-gradient-to-r ${feature.color} rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg`}
+                    className={`w-20 h-20 bg-gradient-to-r ${displayColor} rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg`}
                   >
                     {feature.icon && iconMap[feature.icon] 
                       ? React.createElement(iconMap[feature.icon], { className: "h-10 w-10 text-white" })
@@ -923,12 +929,12 @@ export default function LandingPage() {
                   {/* Hover Border Effect */}
                   <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     <div
-                      className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${feature.color} opacity-20 blur-sm`}
+                      className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${displayColor} opacity-20 blur-sm`}
                     ></div>
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
 
           {/* Statistics Section */}

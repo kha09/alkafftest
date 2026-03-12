@@ -255,6 +255,7 @@
     "id": 1,
     "title": "لماذا SM Alkaff؟",
     "description": "نحن نجعل رحلة التقديم الجامعي أسهل وأكثر فعالية من خلال منصتنا المتطورة والمبتكرة",
+    "useUniversityColor": false,
     "features": [
       {
         "icon": "FileText",

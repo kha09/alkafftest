@@ -6,6 +6,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { TailwindGradientPicker } from '@/components/ui/tailwind-gradient-picker'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 
 interface WhySMAlkaffEditorProps {
   whySMAlkaff?: WhySMAlkaff
@@ -17,14 +20,15 @@ export default function WhySMAlkaffEditor({ whySMAlkaff, onChange }: WhySMAlkaff
     id: 0,
     title: '',
     description: '',
+    useUniversityColor: false,
     features: [
       {
         icon: '',
         title: '',
         subtitle: '',
         description: '',
-        color: '',
-        delay: '',
+        color: 'from-blue-500 to-cyan-500',
+        delay: '0',
         stats: '',
         statsLabel: '',
       },
@@ -33,8 +37,8 @@ export default function WhySMAlkaffEditor({ whySMAlkaff, onChange }: WhySMAlkaff
         title: '',
         subtitle: '',
         description: '',
-        color: '',
-        delay: '',
+        color: 'from-emerald-500 to-teal-500',
+        delay: '200',
         stats: '',
         statsLabel: '',
       },
@@ -43,8 +47,8 @@ export default function WhySMAlkaffEditor({ whySMAlkaff, onChange }: WhySMAlkaff
         title: '',
         subtitle: '',
         description: '',
-        color: '',
-        delay: '',
+        color: 'from-purple-500 to-pink-500',
+        delay: '400',
         stats: '',
         statsLabel: '',
       },
@@ -53,8 +57,8 @@ export default function WhySMAlkaffEditor({ whySMAlkaff, onChange }: WhySMAlkaff
         title: '',
         subtitle: '',
         description: '',
-        color: '',
-        delay: '',
+        color: 'from-orange-500 to-red-500',
+        delay: '600',
         stats: '',
         statsLabel: '',
       },
@@ -74,6 +78,13 @@ export default function WhySMAlkaffEditor({ whySMAlkaff, onChange }: WhySMAlkaff
     setSection(updatedSection)
     onChange(updatedSection)
   }
+
+  const handleUseUniversityColorChange = (checked: boolean) => {
+    const updatedSection = { ...section, useUniversityColor: checked }
+    setSection(updatedSection)
+    onChange(updatedSection)
+  }
+
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -96,6 +107,23 @@ export default function WhySMAlkaffEditor({ whySMAlkaff, onChange }: WhySMAlkaff
               value={section.description}
               onChange={(e) => handleSectionChange('description', e.target.value)}
               placeholder="نحن نجعل رحلة التقديم الجامعي أسهل وأكثر فعالية من خلال منصتنا المتطورة والمبتكرة"
+            />
+          </div>
+          
+          {/* Use University Color Toggle */}
+          <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div>
+              <Label htmlFor="useUniversityColor" className="text-sm font-medium">
+                استخدام لون الجامعة المختارة
+              </Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                عند تفعيل هذا الخيار، سيظهر قسم "لماذا SM Alkaff؟" بلون الجامعة المختارة في الصفحة الرئيسية
+              </p>
+            </div>
+            <Switch
+              id="useUniversityColor"
+              checked={section.useUniversityColor}
+              onCheckedChange={handleUseUniversityColorChange}
             />
           </div>
         </CardContent>
@@ -136,11 +164,17 @@ export default function WhySMAlkaffEditor({ whySMAlkaff, onChange }: WhySMAlkaff
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">اللون</label>
-                  <Input
+                  <TailwindGradientPicker
+                    label=""
                     value={feature.color}
-                    onChange={(e) => handleFeatureChange(index, 'color', e.target.value)}
-                    placeholder="from-blue-500 to-cyan-500"
+                    onChange={(color) => handleFeatureChange(index, 'color', color)}
+                    placeholder="اختر تدرج لوني"
                   />
+                  <div className="mt-2">
+                    <div 
+                      className={`w-full h-6 rounded-md border bg-gradient-to-r ${feature.color}`}
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">التأخير</label>
