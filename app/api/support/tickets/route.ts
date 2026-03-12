@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
+import { createNotification } from '@/lib/notificationService'
 
 // GET /api/support/tickets - List tickets with filtering
 export async function GET(request: NextRequest) {
@@ -179,6 +180,37 @@ export async function POST(request: NextRequest) {
         isInternal: false
       }
     })
+
+    // Notify admins about the new support ticket (non-blocking)
+    try {
+      const priorityMap: Record<string, 'low' | 'normal' | 'high' | 'urgent'> = {
+        low: 'low',
+        medium: 'normal',
+        high: 'high',
+        urgent: 'urgent'
+      }
+      const notificationPriority = priorityMap[ticket.priority] || 'normal'
+      const notificationType = ['high', 'urgent'].includes(ticket.priority) ? 'warning' : 'info'
+      const creatorName = ticket.createdBy?.fullName || session.user.name || 'طالب'
+
+      await createNotification({
+        title: 'تذكرة دعم جديدة',
+        message: `أنشأ ${creatorName} تذكرة دعم جديدة: "${ticket.title}"`,
+        type: notificationType,
+        priority: notificationPriority,
+        entityId: ticket.id,
+        entityType: 'support_ticket',
+        actionUrl: '/dashboard/support',
+        metadata: {
+          ticketId: ticket.id,
+          ticketTitle: ticket.title,
+          category: ticket.category,
+          createdById: ticket.createdById
+        }
+      })
+    } catch (notifError) {
+      console.error('Support ticket notification error:', notifError)
+    }
 
     return NextResponse.json(ticket, { status: 201 })
   } catch (error) {
