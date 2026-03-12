@@ -228,6 +228,7 @@ export async function POST(request: NextRequest) {
           recipientType: 'individual',
           recipientIds: JSON.stringify([studentUserId]),
           priority: 'normal',
+          noteType: 'system',
           readStatus: JSON.stringify({})
         }
       })

@@ -23,6 +23,8 @@ export async function GET(request: NextRequest) {
     const priority = searchParams.get('priority')
     const search = searchParams.get('search')
 
+    const noteType = searchParams.get('noteType')
+
     const skip = (page - 1) * limit
     const whereClause: any = {}
     
@@ -32,6 +34,10 @@ export async function GET(request: NextRequest) {
     
     if (priority && priority !== 'all') {
       whereClause.priority = priority
+    }
+
+    if (noteType && noteType !== 'all') {
+      whereClause.noteType = noteType
     }
 
     if (search) {
@@ -203,6 +209,7 @@ export async function POST(request: NextRequest) {
         recipientType,
         recipientIds: JSON.stringify(recipientIds),
         priority: priority || 'normal',
+        noteType: 'manual',
         expiresAt: expiresAt ? new Date(expiresAt) : null,
         readStatus: JSON.stringify({}) // Empty object initially
       },

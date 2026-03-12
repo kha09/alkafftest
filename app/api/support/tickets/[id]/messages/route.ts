@@ -219,6 +219,7 @@ export async function POST(
             recipientType: 'individual',
             recipientIds: JSON.stringify([ticketOwner.id]),
             priority: 'normal',
+            noteType: 'system',
             readStatus: JSON.stringify({})
           }
         })
@@ -262,6 +263,7 @@ export async function POST(
             recipientType: 'individual',
             recipientIds: JSON.stringify([ticketOwner.id]),
             priority: 'normal',
+            noteType: 'system',
             readStatus: JSON.stringify({})
           }
         })

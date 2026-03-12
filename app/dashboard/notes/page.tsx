@@ -99,11 +99,22 @@ export default function NotesPage() {
     isActive: true
   })
 
-  // Sent notes state
+  // Sent notes state (all)
   const [sentNotes, setSentNotes] = useState<SentNote[]>([])
   const [sentNotesLoading, setSentNotesLoading] = useState(true)
   const [sentNotesPage, setSentNotesPage] = useState(1)
   const [sentNotesTotalPages, setSentNotesTotalPages] = useState(1)
+
+  // Manual notes only state
+  const [manualNotes, setManualNotes] = useState<SentNote[]>([])
+  const [manualNotesLoading, setManualNotesLoading] = useState(true)
+  const [manualNotesPage, setManualNotesPage] = useState(1)
+  const [manualNotesTotalPages, setManualNotesTotalPages] = useState(1)
+  const [manualNotesFilters, setManualNotesFilters] = useState({
+    recipientType: 'all',
+    priority: 'all',
+    search: ''
+  })
 
   // Send note state
   const [sendNoteDialogOpen, setSendNoteDialogOpen] = useState(false)
@@ -136,6 +147,10 @@ export default function NotesPage() {
   useEffect(() => {
     fetchSentNotes()
   }, [sentNotesPage, sentNotesFilters])
+
+  useEffect(() => {
+    fetchManualNotes()
+  }, [manualNotesPage, manualNotesFilters])
 
   const fetchTemplates = async () => {
     try {
@@ -183,6 +198,34 @@ export default function NotesPage() {
       })
     } finally {
       setSentNotesLoading(false)
+    }
+  }
+
+  const fetchManualNotes = async () => {
+    try {
+      setManualNotesLoading(true)
+      const params = new URLSearchParams({
+        page: manualNotesPage.toString(),
+        limit: '10',
+        noteType: 'manual'
+      })
+      if (manualNotesFilters.recipientType !== 'all') params.append('recipientType', manualNotesFilters.recipientType)
+      if (manualNotesFilters.priority !== 'all') params.append('priority', manualNotesFilters.priority)
+      if (manualNotesFilters.search) params.append('search', manualNotesFilters.search)
+      
+      const response = await fetch(`/api/admin/sent-notes?${params}`)
+      const data = await response.json()
+      setManualNotes(data.sentNotes)
+      setManualNotesTotalPages(data.pagination.pages)
+    } catch (error) {
+      console.error('Error fetching manual notes:', error)
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ أثناء جلب الملاحظات",
+        variant: "destructive",
+      })
+    } finally {
+      setManualNotesLoading(false)
     }
   }
 
@@ -349,6 +392,7 @@ export default function NotesPage() {
 
       setSendNoteDialogOpen(false)
       fetchSentNotes()
+      fetchManualNotes()
     } catch (error: any) {
       toast({
         title: "خطأ",
@@ -448,9 +492,10 @@ export default function NotesPage() {
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="templates">قوالب الملاحظات</TabsTrigger>
-          <TabsTrigger value="sent">الملاحظات المرسلة</TabsTrigger>
+          <TabsTrigger value="sent">جميع الإشعارات</TabsTrigger>
+          <TabsTrigger value="notes">الملاحظات فقط</TabsTrigger>
         </TabsList>
 
         <TabsContent value="templates" className="space-y-6">
@@ -559,7 +604,7 @@ export default function NotesPage() {
                 <div className="relative flex-1">
                   <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#4b5563] w-4 h-4" />
                   <Input
-                    placeholder="البحث في الملاحظات..."
+                    placeholder="البحث في الإشعارات..."
                     className="pr-10"
                     value={sentNotesFilters.search}
                     onChange={(e) => setSentNotesFilters(prev => ({ ...prev, search: e.target.value }))}
@@ -599,7 +644,7 @@ export default function NotesPage() {
           {/* Sent Notes List */}
           <Card>
             <CardHeader>
-              <CardTitle>الملاحظات المرسلة</CardTitle>
+              <CardTitle>جميع الإشعارات المرسلة</CardTitle>
             </CardHeader>
             <CardContent>
               {sentNotesLoading ? (
@@ -663,7 +708,7 @@ export default function NotesPage() {
                   ))}
                   {sentNotes.length === 0 && (
                     <div className="text-center py-8 text-gray-500">
-                      لا توجد ملاحظات مرسلة
+                      لا توجد إشعارات مرسلة
                     </div>
                   )}
                 </div>
@@ -688,6 +733,153 @@ export default function NotesPage() {
                     size="sm"
                     onClick={() => setSentNotesPage(p => Math.min(sentNotesTotalPages, p + 1))}
                     disabled={sentNotesPage === sentNotesTotalPages}
+                  >
+                    التالي
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="notes" className="space-y-6">
+          {/* Manual Notes Filters */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#4b5563] w-4 h-4" />
+                  <Input
+                    placeholder="البحث في الملاحظات..."
+                    className="pr-10"
+                    value={manualNotesFilters.search}
+                    onChange={(e) => setManualNotesFilters(prev => ({ ...prev, search: e.target.value }))}
+                  />
+                </div>
+                <Select 
+                  value={manualNotesFilters.recipientType} 
+                  onValueChange={(value) => setManualNotesFilters(prev => ({ ...prev, recipientType: value }))}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="المستقبلون" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">جميع المستقبلين</SelectItem>
+                    <SelectItem value="agents">الوكلاء</SelectItem>
+                    <SelectItem value="students">الطلاب</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select 
+                  value={manualNotesFilters.priority} 
+                  onValueChange={(value) => setManualNotesFilters(prev => ({ ...prev, priority: value }))}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="الأولوية" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">جميع الأولويات</SelectItem>
+                    {priorities.map(priority => (
+                      <SelectItem key={priority.value} value={priority.value}>{priority.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Manual Notes List */}
+          <Card>
+            <CardHeader>
+              <CardTitle>الملاحظات المرسلة يدوياً</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {manualNotesLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#111827]"></div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {manualNotes.map((note) => (
+                    <div key={note.id} className="border rounded-lg p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            {note.template && (
+                              <Badge className="bg-green-100 text-green-800">
+                                {note.template.title}
+                              </Badge>
+                            )}
+                            <Badge className={getPriorityColor(note.priority)}>
+                              {getPriorityLabel(note.priority)}
+                            </Badge>
+                            <Badge variant="outline">
+                              {note.recipientType === 'agents' ? 'الوكلاء' : 
+                               note.recipientType === 'students' ? 'الطلاب' : 'الجميع'}
+                            </Badge>
+                            <Badge className="bg-blue-100 text-blue-800">ملاحظة يدوية</Badge>
+                          </div>
+                          <p className="text-sm text-[#4b5563] mb-3 line-clamp-2">{note.content}</p>
+                          <div className="grid grid-cols-4 gap-4 text-sm">
+                            <div className="flex items-center gap-2">
+                              <Users className="w-4 h-4 text-[#6b7280]" />
+                              <span>{note.recipientCount} مستقبل</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                              <span>{note.readCount} قرأ</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4 text-orange-600" />
+                              <span>{note.unreadCount} لم يقرأ</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Clock className="w-4 h-4 text-[#6b7280]" />
+                              <span>{new Date(note.sentAt).toLocaleDateString('ar-SA')}</span>
+                            </div>
+                          </div>
+                          <div className="mt-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-[#6b7280]">معدل القراءة:</span>
+                              <div className="flex-1 bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className="bg-green-600 h-2 rounded-full" 
+                                  style={{ width: `${note.readPercentage}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-xs font-medium">{note.readPercentage}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {manualNotes.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      لا توجد ملاحظات يدوية مرسلة
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {manualNotesTotalPages > 1 && (
+                <div className="flex justify-center mt-6 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setManualNotesPage(p => Math.max(1, p - 1))}
+                    disabled={manualNotesPage === 1}
+                  >
+                    السابق
+                  </Button>
+                  <span className="px-3 py-2 rounded bg-gray-100 text-gray-700">
+                    صفحة {manualNotesPage} من {manualNotesTotalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setManualNotesPage(p => Math.min(manualNotesTotalPages, p + 1))}
+                    disabled={manualNotesPage === manualNotesTotalPages}
                   >
                     التالي
                   </Button>

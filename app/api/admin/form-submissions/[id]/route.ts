@@ -175,6 +175,7 @@ export async function PUT(request: NextRequest) {
                   recipientType: 'individual',
                   recipientIds: JSON.stringify([agentUser.id]),
                   priority: 'normal',
+                  noteType: 'system',
                   readStatus: JSON.stringify({})
                 }
               })
@@ -226,6 +227,7 @@ export async function PUT(request: NextRequest) {
               recipientType: 'individual',
               recipientIds: JSON.stringify([studentUser.id]),
               priority: 'normal',
+              noteType: 'system',
               readStatus: JSON.stringify({})
             }
           })

@@ -332,6 +332,7 @@ model SentNote {
   recipientIds    String     // JSON array of user IDs who should receive this note
   readStatus      String     @default("{}") // JSON object tracking read status {userId: timestamp}
   priority        String     @default("normal") // "low", "normal", "high", "urgent"
+  noteType        String     @default("manual") // "manual" (admin-sent notes) or "system" (auto-generated notifications)
   expiresAt       DateTime?  // Optional expiration date
   sentAt          DateTime   @default(now())
   createdAt       DateTime   @default(now())
