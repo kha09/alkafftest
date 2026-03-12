@@ -173,6 +173,7 @@ export async function POST(
     const ticketOwner = ticket.createdBy
     const isAdminOrAgentReply = (senderRole === 'admin' || senderRole === 'agent')
     const isStudentOwner = ticketOwner.role === 'student'
+    const isAgentOwner = ticketOwner.role === 'agent'
     const isPublicMessage = !finalIsInternal
 
     // Notify admin when student replies (non-blocking)
@@ -248,6 +249,49 @@ export async function POST(
         }
       } catch (emailError) {
         console.error('Ticket reply email error:', emailError)
+      }
+    }
+
+    if (isAdminOrAgentReply && isAgentOwner && isPublicMessage) {
+      // In-app notification via SentNote for agent (non-blocking)
+      try {
+        await prisma.sentNote.create({
+          data: {
+            content: `تم الرد على تذكرة الدعم الخاصة بك رقم #${ticketId}. الرسالة: "${message.trim().slice(0, 200)}${message.trim().length > 200 ? '...' : ''}"`,
+            senderId: userId,
+            recipientType: 'individual',
+            recipientIds: JSON.stringify([ticketOwner.id]),
+            priority: 'normal',
+            readStatus: JSON.stringify({})
+          }
+        })
+      } catch (agentSentNoteError) {
+        console.error('Ticket reply agent SentNote error:', agentSentNoteError)
+      }
+
+      // Email notification to agent (non-blocking)
+      try {
+        if (ticketOwner.email) {
+          const senderName = newMessage.sender.fullName || 'فريق الدعم'
+          await sendEmail({
+            to: ticketOwner.email,
+            subject: `رد جديد على تذكرة الدعم #${ticketId}`,
+            text: `مرحباً ${ticketOwner.fullName}،\n\nتم الرد على تذكرة الدعم الخاصة بك رقم #${ticketId}.\n\nالرد:\n${message.trim()}\n\nمن: ${senderName}\n\nيمكنك الاطلاع على التذكرة كاملة من خلال لوحة التحكم الخاصة بك.\n\nشكراً،\nفريق SM Alkaff`,
+            html: `<div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #111827;">رد جديد على تذكرة الدعم #${ticketId}</h2>
+              <p>مرحباً ${ticketOwner.fullName}،</p>
+              <p>تم الرد على تذكرة الدعم الخاصة بك.</p>
+              <div style="background: #f9fafb; border-right: 4px solid #374151; padding: 16px; margin: 16px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #111827;">${message.trim().replace(/\n/g, '<br>')}</p>
+              </div>
+              <p style="color: #6b7280; font-size: 14px;">من: <strong>${senderName}</strong></p>
+              <p style="color: #6b7280; font-size: 14px;">يمكنك الاطلاع على التذكرة كاملة من خلال لوحة التحكم الخاصة بك.</p>
+              <p style="color: #6b7280; font-size: 14px;">شكراً،<br/>فريق SM Alkaff</p>
+            </div>`
+          })
+        }
+      } catch (agentEmailError) {
+        console.error('Ticket reply agent email error:', agentEmailError)
       }
     }
 
