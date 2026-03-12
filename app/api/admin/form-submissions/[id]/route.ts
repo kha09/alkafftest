@@ -39,7 +39,8 @@ export async function PUT(request: NextRequest) {
         submissionStatus: true,
         agentId: true,
         fullName: true,
-        agent: { select: { id: true, email: true, name: true } }
+        agent: { select: { id: true, email: true, name: true } },
+        user: { select: { id: true, email: true, fullName: true } }
       }
     })
     
@@ -134,38 +135,43 @@ export async function PUT(request: NextRequest) {
       }
     })
 
-    // Notify agent when submissionStatus changes (non-blocking)
+    // Notify agent and student when submissionStatus changes (non-blocking)
     const newStatus = updatedSubmission.submissionStatus
     const oldStatus = currentSubmission?.submissionStatus
     const statusChanged = data.submissionStatus !== undefined && newStatus !== oldStatus
-    const agentRecord = currentSubmission?.agent
 
-    if (statusChanged && agentRecord?.email) {
+    if (statusChanged) {
       const studentName = currentSubmission?.fullName || 'الطالب'
       const oldLabel = statusLabels[oldStatus || ''] || oldStatus || ''
       const newLabel = statusLabels[newStatus || ''] || newStatus || ''
 
-      // Find the agent's User record (SentNote uses User.id, not Agent.id)
+      // Look up admin user once (used as SentNote sender)
+      let adminUserId: number | null = null
       try {
-        const agentUser = await prisma.user.findFirst({
-          where: { email: agentRecord.email, role: 'agent' },
+        const adminUser = await prisma.user.findFirst({
+          where: { role: 'admin' },
           select: { id: true }
         })
+        adminUserId = adminUser?.id ?? null
+      } catch (e) {
+        console.error('Admin user lookup error:', e)
+      }
 
-        if (agentUser) {
-          // Find a sender (first admin user)
-          const adminUser = await prisma.user.findFirst({
-            where: { role: 'admin' },
+      // --- Notify agent ---
+      const agentRecord = currentSubmission?.agent
+      if (agentRecord?.email) {
+        try {
+          const agentUser = await prisma.user.findFirst({
+            where: { email: agentRecord.email, role: 'agent' },
             select: { id: true }
           })
 
-          if (adminUser) {
-            // In-app notification via SentNote
+          if (agentUser && adminUserId) {
             try {
               await prisma.sentNote.create({
                 data: {
                   content: `تم تغيير حالة تقدم الطالب "${studentName}" من "${oldLabel}" إلى "${newLabel}".`,
-                  senderId: adminUser.id,
+                  senderId: adminUserId,
                   recipientType: 'individual',
                   recipientIds: JSON.stringify([agentUser.id]),
                   priority: 'normal',
@@ -176,37 +182,87 @@ export async function PUT(request: NextRequest) {
               console.error('Agent status-change SentNote error:', sentNoteError)
             }
           }
+
+          try {
+            await sendEmail({
+              to: agentRecord.email,
+              subject: `تحديث حالة تقدم الطالب - ${studentName}`,
+              text: `مرحباً،\n\nتم تغيير حالة تقدم الطالب "${studentName}" من "${oldLabel}" إلى "${newLabel}".\n\nيمكنك متابعة التفاصيل من خلال لوحة التحكم الخاصة بك.\n\nشكراً،\nفريق SM Alkaff`,
+              html: `<div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #111827;">تحديث حالة تقدم الطالب</h2>
+                <p>مرحباً،</p>
+                <p>تم تغيير حالة تقدم الطالب <strong>${studentName}</strong>:</p>
+                <table style="width:100%; border-collapse:collapse; margin: 16px 0;">
+                  <tr style="background:#f9fafb;">
+                    <td style="padding:10px; border:1px solid #e5e7eb; font-weight:bold; width:40%;">الحالة السابقة</td>
+                    <td style="padding:10px; border:1px solid #e5e7eb;">${oldLabel}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px; border:1px solid #e5e7eb; font-weight:bold;">الحالة الجديدة</td>
+                    <td style="padding:10px; border:1px solid #e5e7eb; color:#059669; font-weight:bold;">${newLabel}</td>
+                  </tr>
+                </table>
+                <p style="color:#6b7280; font-size:14px;">يمكنك متابعة التفاصيل من خلال لوحة التحكم الخاصة بك.</p>
+                <p style="color:#6b7280; font-size:14px;">شكراً،<br/>فريق SM Alkaff</p>
+              </div>`
+            })
+          } catch (emailError) {
+            console.error('Agent status-change email error:', emailError)
+          }
+        } catch (agentLookupError) {
+          console.error('Agent user lookup error:', agentLookupError)
+        }
+      }
+
+      // --- Notify student ---
+      const studentUser = currentSubmission?.user
+      if (studentUser?.id && adminUserId) {
+        // In-app notification via SentNote
+        try {
+          await prisma.sentNote.create({
+            data: {
+              content: `تم تحديث حالة تقدمك إلى "${newLabel}".`,
+              senderId: adminUserId,
+              recipientType: 'individual',
+              recipientIds: JSON.stringify([studentUser.id]),
+              priority: 'normal',
+              readStatus: JSON.stringify({})
+            }
+          })
+        } catch (studentSentNoteError) {
+          console.error('Student status-change SentNote error:', studentSentNoteError)
         }
 
-        // Email to agent (uses Agent.email directly — no User mapping needed)
-        try {
-          await sendEmail({
-            to: agentRecord.email,
-            subject: `تحديث حالة تقدم الطالب - ${studentName}`,
-            text: `مرحباً،\n\nتم تغيير حالة تقدم الطالب "${studentName}" من "${oldLabel}" إلى "${newLabel}".\n\nيمكنك متابعة التفاصيل من خلال لوحة التحكم الخاصة بك.\n\nشكراً،\nفريق SM Alkaff`,
-            html: `<div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #111827;">تحديث حالة تقدم الطالب</h2>
-              <p>مرحباً،</p>
-              <p>تم تغيير حالة تقدم الطالب <strong>${studentName}</strong>:</p>
-              <table style="width:100%; border-collapse:collapse; margin: 16px 0;">
-                <tr style="background:#f9fafb;">
-                  <td style="padding:10px; border:1px solid #e5e7eb; font-weight:bold; width:40%;">الحالة السابقة</td>
-                  <td style="padding:10px; border:1px solid #e5e7eb;">${oldLabel}</td>
-                </tr>
-                <tr>
-                  <td style="padding:10px; border:1px solid #e5e7eb; font-weight:bold;">الحالة الجديدة</td>
-                  <td style="padding:10px; border:1px solid #e5e7eb; color:#059669; font-weight:bold;">${newLabel}</td>
-                </tr>
-              </table>
-              <p style="color:#6b7280; font-size:14px;">يمكنك متابعة التفاصيل من خلال لوحة التحكم الخاصة بك.</p>
-              <p style="color:#6b7280; font-size:14px;">شكراً،<br/>فريق SM Alkaff</p>
-            </div>`
-          })
-        } catch (emailError) {
-          console.error('Agent status-change email error:', emailError)
+        // Email to student
+        if (studentUser.email) {
+          try {
+            const studentDisplayName = studentUser.fullName || studentName
+            await sendEmail({
+              to: studentUser.email,
+              subject: `تحديث حالة تقدمك - ${newLabel}`,
+              text: `مرحباً ${studentDisplayName}،\n\nتم تحديث حالة تقدمك من "${oldLabel}" إلى "${newLabel}".\n\nيمكنك متابعة تفاصيل تقدمك من خلال لوحة التحكم الخاصة بك.\n\nشكراً،\nفريق SM Alkaff`,
+              html: `<div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #111827;">تحديث حالة تقدمك</h2>
+                <p>مرحباً ${studentDisplayName}،</p>
+                <p>تم تحديث حالة تقدمك:</p>
+                <table style="width:100%; border-collapse:collapse; margin: 16px 0;">
+                  <tr style="background:#f9fafb;">
+                    <td style="padding:10px; border:1px solid #e5e7eb; font-weight:bold; width:40%;">الحالة السابقة</td>
+                    <td style="padding:10px; border:1px solid #e5e7eb;">${oldLabel}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px; border:1px solid #e5e7eb; font-weight:bold;">الحالة الجديدة</td>
+                    <td style="padding:10px; border:1px solid #e5e7eb; color:#059669; font-weight:bold;">${newLabel}</td>
+                  </tr>
+                </table>
+                <p style="color:#6b7280; font-size:14px;">يمكنك متابعة تفاصيل تقدمك من خلال لوحة التحكم الخاصة بك.</p>
+                <p style="color:#6b7280; font-size:14px;">شكراً،<br/>فريق SM Alkaff</p>
+              </div>`
+            })
+          } catch (studentEmailError) {
+            console.error('Student status-change email error:', studentEmailError)
+          }
         }
-      } catch (agentLookupError) {
-        console.error('Agent user lookup error:', agentLookupError)
       }
     }
 
