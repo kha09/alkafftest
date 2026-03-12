@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { sendEmail } from '@/lib/emailService'
+import { createNotification } from '@/lib/notificationService'
 
 // GET /api/support/tickets/[id]/messages - Get messages for a ticket
 export async function GET(
@@ -173,6 +174,38 @@ export async function POST(
     const isAdminOrAgentReply = (senderRole === 'admin' || senderRole === 'agent')
     const isStudentOwner = ticketOwner.role === 'student'
     const isPublicMessage = !finalIsInternal
+
+    // Notify admin when student replies (non-blocking)
+    if (senderRole === 'student' && isPublicMessage) {
+      try {
+        const priorityMap: Record<string, 'low' | 'normal' | 'high' | 'urgent'> = {
+          low: 'low',
+          medium: 'normal',
+          high: 'high',
+          urgent: 'urgent'
+        }
+        const notifPriority = priorityMap[ticket.priority] || 'normal'
+        const notifType = ['high', 'urgent'].includes(ticket.priority) ? 'warning' : 'info'
+        const studentName = ticketOwner.fullName || 'الطالب'
+
+        await createNotification({
+          title: 'رد جديد من الطالب على تذكرة الدعم',
+          message: `أرسل ${studentName} رداً على تذكرة الدعم رقم #${ticketId}: "${message.trim().slice(0, 150)}${message.trim().length > 150 ? '...' : ''}"`,
+          type: notifType,
+          priority: notifPriority,
+          entityId: ticketId,
+          entityType: 'support_ticket',
+          actionUrl: '/dashboard/support',
+          metadata: {
+            ticketId,
+            studentId: ticketOwner.id,
+            studentName
+          }
+        })
+      } catch (adminNotifError) {
+        console.error('Student reply admin notification error:', adminNotifError)
+      }
+    }
 
     if (isAdminOrAgentReply && isStudentOwner && isPublicMessage) {
       // In-app notification via SentNote (non-blocking)
