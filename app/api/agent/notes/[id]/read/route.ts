@@ -19,16 +19,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Invalid note ID' }, { status: 400 })
     }
 
-    // Find the agent record by email
-    const agent = await prisma.agent.findUnique({
-      where: { email: session.user.email }
-    })
-
-    if (!agent) {
-      return NextResponse.json({ error: 'Agent not found' }, { status: 404 })
-    }
-
-    const agentId = agent.id
+    const userId = parseInt(session.user.id)
 
     // Find the note
     const note = await prisma.sentNote.findUnique({
@@ -41,7 +32,7 @@ export async function PUT(
 
     // Check if agent is a recipient
     const recipientIds = JSON.parse(note.recipientIds || '[]')
-    const isRecipient = recipientIds.includes(agentId) || 
+    const isRecipient = recipientIds.includes(userId) || 
                        note.recipientType === 'all' || 
                        note.recipientType === 'agents'
 
@@ -51,7 +42,7 @@ export async function PUT(
 
     // Update read status
     const readStatus = JSON.parse(note.readStatus || '{}')
-    readStatus[agentId.toString()] = new Date().toISOString()
+    readStatus[userId.toString()] = new Date().toISOString()
 
     await prisma.sentNote.update({
       where: { id: noteId },

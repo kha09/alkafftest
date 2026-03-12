@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/db'
 import { uploadFileToS3, validateS3Config } from '@/lib/s3Client'
 import { createNotification } from '@/lib/notificationService'
@@ -19,7 +21,7 @@ export async function POST(request: NextRequest) {
     const preferredProgram = formData.get('preferredProgram') as string
     const universityId = formData.get('universityId') as string | null
     const programId = formData.get('programId') as string | null
-    const agentId = formData.get('agentId') as string | null
+    const agentIdFromForm = formData.get('agentId') as string | null
     
     // Validate required fields
     if (!fullName || !nationality || !email || !countryOfResidence || 
@@ -38,6 +40,29 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
+
+    // Resolve agentId: if the request comes from an agent session, look up the Agent record
+    // by email to get the correct Agent.id (FK to Agent table, not User table).
+    // Never trust the form-provided agentId when a session is present — it may be stale/wrong.
+    let resolvedAgentId: number | null = null
+    try {
+      const session = await getServerSession(authOptions)
+      if (session?.user?.role === 'agent' && session.user.email) {
+        // Agent session: resolve Agent.id from Agent table by email
+        const agentRecord = await prisma.agent.findUnique({
+          where: { email: session.user.email },
+          select: { id: true }
+        })
+        resolvedAgentId = agentRecord ? agentRecord.id : null
+      } else if (!session || session.user.role === 'admin') {
+        // Public submission or admin-created: use form-provided agentId as-is
+        resolvedAgentId = agentIdFromForm ? parseInt(agentIdFromForm) : null
+      }
+    } catch (sessionError) {
+      // If session lookup fails entirely, fall back to form-provided agentId
+      console.error('Agent session lookup error:', sessionError)
+      resolvedAgentId = agentIdFromForm ? parseInt(agentIdFromForm) : null
+    }
     
     // Create form submission record first
     const formSubmission = await prisma.formSubmission.create({
@@ -51,7 +76,7 @@ export async function POST(request: NextRequest) {
         preferredProgram,
         universityId: universityId ? parseInt(universityId) : null,
         programId: programId ? parseInt(programId) : null,
-        agentId: agentId ? parseInt(agentId) : null,
+        agentId: resolvedAgentId,
       }
     })
     

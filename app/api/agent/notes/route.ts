@@ -11,17 +11,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // For agents, we need to get the agent ID from the Agent table
-    // First, find the agent record by email
-    const agent = await prisma.agent.findUnique({
-      where: { email: session.user.email }
-    })
-
-    if (!agent) {
-      return NextResponse.json({ error: 'Agent not found' }, { status: 404 })
-    }
-
-    const agentId = agent.id
+    const userId = parseInt(session.user.id)
 
     // Get all notes and filter for this agent
     const allNotes = await prisma.sentNote.findMany({
@@ -50,7 +40,7 @@ export async function GET(request: NextRequest) {
     const agentNotes = allNotes.filter((note: any) => {
       try {
         const recipientIds = JSON.parse(note.recipientIds || '[]')
-        return recipientIds.includes(agentId) || 
+        return recipientIds.includes(userId) || 
                note.recipientType === 'all' || 
                note.recipientType === 'agents'
       } catch (e) {
@@ -67,7 +57,7 @@ export async function GET(request: NextRequest) {
         readStatus = {}
       }
 
-      const userReadStatus = readStatus[agentId.toString()]
+      const userReadStatus = readStatus[userId.toString()]
       
       return {
         id: note.id,
