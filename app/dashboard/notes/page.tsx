@@ -540,10 +540,10 @@ export default function NotesPage() {
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="templates">قوالب الملاحظات</TabsTrigger>
-          <TabsTrigger value="sent">جميع الإشعارات</TabsTrigger>
-          <TabsTrigger value="notes">الملاحظات فقط</TabsTrigger>
+          {/* hidden: <TabsTrigger value="sent">جميع الإشعارات</TabsTrigger> */}
+          {/* hidden: <TabsTrigger value="notes">الملاحظات فقط</TabsTrigger> */}
           <TabsTrigger value="recipients">المستخدمون</TabsTrigger>
         </TabsList>
 
