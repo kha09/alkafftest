@@ -116,6 +116,32 @@ export default function NotesPage() {
     search: ''
   })
 
+  // Recipients state
+  type RecipientUser = {
+    id: number
+    fullName: string
+    email: string
+    role: string
+    createdAt: string
+    nationality: string | null
+    contactNumber: string | null
+    preferredProgram: string | null
+    submissionStatus: string | null
+    countryOfResidence: string | null
+  }
+  type Recipient = {
+    user: RecipientUser
+    totalNotes: number
+    unreadNotes: number
+    latestNoteAt: string
+    recentNotes: { id: number; content: string; sentAt: string; priority: string; isRead: boolean }[]
+  }
+  const [recipients, setRecipients] = useState<Recipient[]>([])
+  const [recipientsLoading, setRecipientsLoading] = useState(true)
+  const [recipientsSearch, setRecipientsSearch] = useState('')
+  const [recipientsRoleFilter, setRecipientsRoleFilter] = useState('all')
+  const [selectedRecipient, setSelectedRecipient] = useState<Recipient | null>(null)
+
   // Send note state
   const [sendNoteDialogOpen, setSendNoteDialogOpen] = useState(false)
   const [sendNoteForm, setSendNoteForm] = useState({
@@ -151,6 +177,10 @@ export default function NotesPage() {
   useEffect(() => {
     fetchManualNotes()
   }, [manualNotesPage, manualNotesFilters])
+
+  useEffect(() => {
+    fetchRecipients()
+  }, [recipientsSearch, recipientsRoleFilter])
 
   const fetchTemplates = async () => {
     try {
@@ -198,6 +228,23 @@ export default function NotesPage() {
       })
     } finally {
       setSentNotesLoading(false)
+    }
+  }
+
+  const fetchRecipients = async () => {
+    try {
+      setRecipientsLoading(true)
+      const params = new URLSearchParams()
+      if (recipientsRoleFilter !== 'all') params.append('role', recipientsRoleFilter)
+      if (recipientsSearch) params.append('search', recipientsSearch)
+      const response = await fetch(`/api/admin/sent-notes/recipients?${params}`)
+      const data = await response.json()
+      setRecipients(data.recipients || [])
+    } catch (error) {
+      console.error('Error fetching recipients:', error)
+      toast({ title: "خطأ", description: "حدث خطأ أثناء جلب المستخدمين", variant: "destructive" })
+    } finally {
+      setRecipientsLoading(false)
     }
   }
 
@@ -393,6 +440,7 @@ export default function NotesPage() {
       setSendNoteDialogOpen(false)
       fetchSentNotes()
       fetchManualNotes()
+      fetchRecipients()
     } catch (error: any) {
       toast({
         title: "خطأ",
@@ -492,10 +540,11 @@ export default function NotesPage() {
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="templates">قوالب الملاحظات</TabsTrigger>
           <TabsTrigger value="sent">جميع الإشعارات</TabsTrigger>
           <TabsTrigger value="notes">الملاحظات فقط</TabsTrigger>
+          <TabsTrigger value="recipients">المستخدمون</TabsTrigger>
         </TabsList>
 
         <TabsContent value="templates" className="space-y-6">
@@ -887,6 +936,158 @@ export default function NotesPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+        <TabsContent value="recipients" className="space-y-6">
+          {/* Recipients Filters */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#4b5563] w-4 h-4" />
+                  <Input
+                    placeholder="البحث بالاسم أو البريد الإلكتروني..."
+                    className="pr-10"
+                    value={recipientsSearch}
+                    onChange={(e) => setRecipientsSearch(e.target.value)}
+                  />
+                </div>
+                <Select value={recipientsRoleFilter} onValueChange={setRecipientsRoleFilter}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="الدور" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">الكل</SelectItem>
+                    <SelectItem value="student">الطلاب</SelectItem>
+                    <SelectItem value="agent">الوكلاء</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recipients List */}
+          <div className="grid grid-cols-1 gap-4">
+            {recipientsLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#111827]"></div>
+              </div>
+            ) : recipients.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center text-gray-500">
+                  لا يوجد مستخدمون لديهم ملاحظات
+                </CardContent>
+              </Card>
+            ) : (
+              recipients.map((recipient) => (
+                <Card
+                  key={recipient.user.id}
+                  className={`cursor-pointer transition-all border-2 ${selectedRecipient?.user.id === recipient.user.id ? 'border-[#111827]' : 'border-transparent hover:border-gray-300'}`}
+                  onClick={() => setSelectedRecipient(selectedRecipient?.user.id === recipient.user.id ? null : recipient)}
+                >
+                  <CardContent className="p-5">
+                    <div className="flex items-start justify-between gap-4">
+                      {/* User Info */}
+                      <div className="flex items-start gap-4 flex-1">
+                        <div className="w-12 h-12 rounded-full bg-[#111827] flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                          {recipient.user.fullName.charAt(0)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <h3 className="font-semibold text-[#111827] text-base">{recipient.user.fullName}</h3>
+                            <Badge className={recipient.user.role === 'student' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}>
+                              {recipient.user.role === 'student' ? 'طالب' : 'وكيل'}
+                            </Badge>
+                            {recipient.unreadNotes > 0 && (
+                              <Badge className="bg-red-100 text-red-800">
+                                {recipient.unreadNotes} غير مقروء
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-[#6b7280] mb-2">{recipient.user.email}</p>
+                          <div className="flex flex-wrap gap-4 text-xs text-[#6b7280]">
+                            <span className="flex items-center gap-1">
+                              <MessageSquare className="w-3 h-3" />
+                              {recipient.totalNotes} ملاحظة
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              آخر ملاحظة: {new Date(recipient.latestNoteAt).toLocaleDateString('ar-SA')}
+                            </span>
+                            {recipient.user.nationality && (
+                              <span>الجنسية: {recipient.user.nationality}</span>
+                            )}
+                            {recipient.user.countryOfResidence && (
+                              <span>بلد الإقامة: {recipient.user.countryOfResidence}</span>
+                            )}
+                            {recipient.user.contactNumber && (
+                              <span>الهاتف: {recipient.user.contactNumber}</span>
+                            )}
+                          </div>
+                          {recipient.user.preferredProgram && (
+                            <p className="text-xs text-[#6b7280] mt-1">البرنامج المفضل: {recipient.user.preferredProgram}</p>
+                          )}
+                        </div>
+                      </div>
+                      {/* Stats */}
+                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-[#111827]">{recipient.totalNotes}</p>
+                          <p className="text-xs text-[#6b7280]">ملاحظة</p>
+                        </div>
+                        {recipient.unreadNotes > 0 ? (
+                          <Badge className="bg-orange-100 text-orange-800">
+                            <AlertCircle className="w-3 h-3 ml-1" />
+                            {recipient.unreadNotes} لم تُقرأ
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-green-100 text-green-800">
+                            <CheckCircle className="w-3 h-3 ml-1" />
+                            مقروءة
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Expanded: Recent Notes */}
+                    {selectedRecipient?.user.id === recipient.user.id && (
+                      <div className="mt-4 pt-4 border-t space-y-3">
+                        <h4 className="font-medium text-[#111827] text-sm">آخر الملاحظات المرسلة:</h4>
+                        {recipient.recentNotes.length === 0 ? (
+                          <p className="text-sm text-gray-500">لا توجد ملاحظات</p>
+                        ) : (
+                          recipient.recentNotes.map((note) => (
+                            <div key={note.id} className={`rounded-lg p-3 text-sm border-r-4 ${note.isRead ? 'bg-gray-50 border-gray-300' : 'bg-orange-50 border-orange-400'}`}>
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center gap-2">
+                                  <Badge className={getPriorityColor(note.priority)} style={{ fontSize: '10px', padding: '1px 6px' }}>
+                                    {getPriorityLabel(note.priority)}
+                                  </Badge>
+                                  {!note.isRead && <Badge className="bg-orange-100 text-orange-700" style={{ fontSize: '10px', padding: '1px 6px' }}>لم تُقرأ</Badge>}
+                                </div>
+                                <span className="text-xs text-[#6b7280]">{new Date(note.sentAt).toLocaleDateString('ar-SA')}</span>
+                              </div>
+                              <p className="text-[#374151] line-clamp-2">{note.content}</p>
+                            </div>
+                          ))
+                        )}
+                        {/* Full user info section */}
+                        <div className="mt-3 pt-3 border-t grid grid-cols-2 gap-2 text-xs text-[#6b7280]">
+                          <div><span className="font-medium text-[#374151]">الاسم: </span>{recipient.user.fullName}</div>
+                          <div><span className="font-medium text-[#374151]">البريد: </span>{recipient.user.email}</div>
+                          {recipient.user.nationality && <div><span className="font-medium text-[#374151]">الجنسية: </span>{recipient.user.nationality}</div>}
+                          {recipient.user.contactNumber && <div><span className="font-medium text-[#374151]">الهاتف: </span>{recipient.user.contactNumber}</div>}
+                          {recipient.user.countryOfResidence && <div><span className="font-medium text-[#374151]">بلد الإقامة: </span>{recipient.user.countryOfResidence}</div>}
+                          {recipient.user.preferredProgram && <div className="col-span-2"><span className="font-medium text-[#374151]">البرنامج المفضل: </span>{recipient.user.preferredProgram}</div>}
+                          {recipient.user.submissionStatus && <div className="col-span-2"><span className="font-medium text-[#374151]">حالة الطلب: </span>{recipient.user.submissionStatus}</div>}
+                          <div><span className="font-medium text-[#374151]">تاريخ التسجيل: </span>{new Date(recipient.user.createdAt).toLocaleDateString('ar-SA')}</div>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
         </TabsContent>
       </Tabs>
 
