@@ -4,10 +4,11 @@ import prisma from '@/lib/db'
 // GET /api/admin/commissions/[id] - Get a specific commission
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const commissionId = parseInt(params.id)
+    const { id: idParam } = await params
+    const commissionId = parseInt(idParam)
 
     if (isNaN(commissionId)) {
       return NextResponse.json({ error: 'معرف العمولة غير صحيح' }, { status: 400 })
@@ -56,10 +57,11 @@ export async function GET(
 // PATCH /api/admin/commissions/[id] - Update commission status
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const commissionId = parseInt(params.id)
+    const { id: idParam } = await params
+    const commissionId = parseInt(idParam)
 
     if (isNaN(commissionId)) {
       return NextResponse.json({ error: 'معرف العمولة غير صحيح' }, { status: 400 })
@@ -141,10 +143,11 @@ export async function PATCH(
 // DELETE /api/admin/commissions/[id] - Delete a commission
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const commissionId = parseInt(params.id)
+    const { id: idParam } = await params
+    const commissionId = parseInt(idParam)
 
     if (isNaN(commissionId)) {
       return NextResponse.json({ error: 'معرف العمولة غير صحيح' }, { status: 400 })

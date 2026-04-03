@@ -230,7 +230,7 @@ export default function AgentDashboard() {
               <Users className="w-5 h-5" />
               الطلاب المسجلين عبرك
             </CardTitle>
-            <Button className="bg-[#1f2937] hover:bg-[#374151]">إضافة طالب جديد</Button>
+            {/* <Button className="bg-[#1f2937] hover:bg-[#374151]">إضافة طالب جديد</Button> */}
           </CardHeader>
           <CardContent>
             <div className="mb-4">
