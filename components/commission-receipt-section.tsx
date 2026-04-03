@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Eye, Upload, CheckCircle, Clock, AlertCircle, RefreshCw, Truck, TruckIcon } from "lucide-react"
+import { Eye, Upload, CheckCircle, Clock } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
@@ -125,39 +125,6 @@ export function CommissionReceiptSection({ commission, onCommissionUpdate }: Com
       });
     } finally {
       setUploading(false);
-    }
-  };
-
-  const handleMarkDelivered = async (delivered: boolean) => {
-    try {
-      const response = await fetch(`/api/admin/commissions/${commission.id}/mark-delivered`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ delivered })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        onCommissionUpdate(data.commission);
-        toast({
-          title: "نجح",
-          description: delivered ? "تم تسجيل تسليم العمولة للوكيل" : "تم إلغاء تسجيل تسليم العمولة",
-        });
-      } else {
-        const errorData = await response.json();
-        toast({
-          title: "خطأ",
-          description: errorData.error || "حدث خطأ أثناء تحديث حالة التسليم",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('Error updating delivery status:', error);
-      toast({
-        title: "خطأ",
-        description: "حدث خطأ أثناء تحديث حالة التسليم",
-        variant: "destructive",
-      });
     }
   };
 
@@ -307,56 +274,6 @@ export function CommissionReceiptSection({ commission, onCommissionUpdate }: Com
           </div>
         )}
       </div>
-
-      {/* Delivery Status Section - Only show for admins */}
-      {session?.user?.role === 'admin' && (
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium text-gray-900">حالة التسليم</h4>
-            <div className="flex gap-2">
-              {!commission.deliveredToAgent ? (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleMarkDelivered(true)}
-                >
-                  <Truck className="w-4 h-4 ml-1" />
-                  تسجيل التسليم
-                </Button>
-              ) : (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleMarkDelivered(false)}
-                >
-                  <RefreshCw className="w-4 h-4 ml-1" />
-                  إلغاء التسليم
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {commission.deliveredToAgent ? (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="font-medium text-green-800">تم التسليم للوكيل</span>
-              </div>
-              
-              <div className="text-sm text-green-700">
-                <strong>تاريخ التسليم:</strong> {commission.deliveredAt ? new Date(commission.deliveredAt).toLocaleDateString('ar-SA') : 'غير محدد'}
-              </div>
-            </div>
-          ) : (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-600">لم يتم التسليم بعد</span>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
