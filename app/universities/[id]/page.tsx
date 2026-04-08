@@ -367,15 +367,15 @@ export default function UniversityDetailPage() {
                               <Clock className="h-5 w-5 text-blue-600" />
                               <div>
                                 <p className="text-sm text-gray-500">{t('university.detail.program.duration')}</p>
-                                <p className="font-medium">{program.duration} {t('university.detail.program.years')}</p>
+                                <p className="font-medium">{program.duration} {t('university.detail.program.duration.years')}</p>
                               </div>
                             </div>
                             
                             <div className="flex items-center space-x-2 space-x-reverse">
                               <DollarSign className="h-5 w-5 text-green-600" />
                               <div>
-                                <p className="text-sm text-gray-500">{t('university.detail.program.tuition')}</p>
-                                <p className="font-medium">{program.tuitionFees.replace('RM', 'USD')} {t('university.detail.program.yearly')}</p>
+                                <p className="text-sm text-gray-500">{t('university.detail.program.fees')}</p>
+                                <p className="font-medium">{program.tuitionFees.replace('RM', 'USD')} {t('university.detail.program.fees.yearly')}</p>
                               </div>
                             </div>
                             

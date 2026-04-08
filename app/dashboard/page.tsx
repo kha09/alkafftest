@@ -1,11 +1,130 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { DollarSign, FileText, Users, TrendingUp, Search, Plus, Download } from "lucide-react"
+import { DollarSign, FileText, Users, TrendingUp, Search, Plus, Download, GraduationCap, BookOpen } from "lucide-react"
+import { RecentOrdersTable } from "@/components/dashboard/RecentOrdersTable"
+import { OrdersChart } from "@/components/dashboard/OrdersChart"
+import { AgentPerformanceChart } from "@/components/dashboard/AgentPerformanceChart"
+import { StatusDistributionChart } from "@/components/dashboard/StatusDistributionChart"
+import { DailySubmissionsChart } from "@/components/dashboard/DailySubmissionsChart"
+import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton"
+import Link from "next/link"
 
-export default function ArabicDashboard() {
+interface DashboardStats {
+  earnings: {
+    total: number
+    monthly: number
+    lastMonth: number
+    growth: number
+  }
+  orders: {
+    total: number
+    processing: number
+    completed: number
+    recent: any[]
+  }
+  partners: {
+    total: number
+    active: number
+    topPerformers: {
+      id: number
+      name: string
+      email: string
+      phone: string | null
+      orderCount: number
+      totalEarnings: number
+    }[]
+  }
+  universities: {
+    total: number
+    programs: number
+  }
+  invoices: {
+    recent: any[]
+    pending: number
+  }
+  students: {
+    total: number
+    submissions: number
+  }
+}
+
+interface ChartData {
+  monthlyOrders: {
+    month: string
+    count: number
+    revenue: number
+  }[]
+  agentPerformance: {
+    name: string
+    orders: number
+    earnings: number
+  }[]
+  statusDistribution: {
+    name: string
+    value: number
+    color: string
+  }[]
+  dailySubmissions: {
+    date: string
+    count: number
+  }[]
+}
+
+export default function AdminDashboardPage() {
+  const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [chartData, setChartData] = useState<ChartData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      try {
+        const [statsRes, chartsRes] = await Promise.all([
+          fetch('/api/admin/dashboard/stats'),
+          fetch('/api/admin/dashboard/charts')
+        ])
+
+        if (!statsRes.ok || !chartsRes.ok) {
+          throw new Error('Failed to fetch dashboard data')
+        }
+
+        const statsData = await statsRes.json()
+        const chartsData = await chartsRes.json()
+
+        setStats(statsData)
+        setChartData(chartsData)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDashboardData()
+  }, [])
+
+  if (loading) {
+    return <DashboardSkeleton />
+  }
+
+  if (error || !stats || !chartData) {
+    return (
+      <div className="min-h-screen bg-[#f9fafb] flex items-center justify-center" dir="rtl">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">حدث خطأ أثناء تحميل البيانات</p>
+          <Button onClick={() => window.location.reload()}>إعادة المحاولة</Button>
+        </div>
+      </div>
+    )
+  }
+
+  const formatCurrency = (amount: number) => `$${amount.toLocaleString()}`
+
   return (
     <div className="min-h-screen bg-[#f9fafb]" dir="rtl">
       {/* Main Content */}
@@ -27,58 +146,68 @@ export default function ArabicDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Total Earnings */}
           <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-[#4b5563] mb-1">إجمالي الأرباح</p>
-                  <p className="text-2xl font-bold text-[#111827]">25,600$</p>
+                  <p className="text-2xl font-bold text-[#111827]">{formatCurrency(stats.earnings.total)}</p>
+                  <p className="text-xs text-green-600 mt-1">
+                    {stats.earnings.growth > 0 ? '+' : ''}{stats.earnings.growth.toFixed(1)}% من الشهر الماضي
+                  </p>
                 </div>
-                <div className="w-12 h-12 bg-[#f3f4f6] rounded-full flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-[#4b5563]" />
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <DollarSign className="w-6 h-6 text-green-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
+          {/* Processing Orders */}
           <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-[#4b5563] mb-1">طلبات قيد المعالجة</p>
-                  <p className="text-2xl font-bold text-[#111827]">128</p>
+                  <p className="text-2xl font-bold text-[#111827]">{stats.orders.processing}</p>
+                  <p className="text-xs text-gray-500 mt-1">من أصل {stats.orders.total} طلب</p>
                 </div>
-                <div className="w-12 h-12 bg-[#f3f4f6] rounded-full flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-[#4b5563]" />
+                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-amber-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
+          {/* Partners (Agents) */}
           <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-[#4b5563] mb-1">عدد الشركاء</p>
-                  <p className="text-2xl font-bold text-[#111827]">18</p>
+                  <p className="text-2xl font-bold text-[#111827]">{stats.partners.total}</p>
+                  <p className="text-xs text-blue-600 mt-1">{stats.partners.active} نشط هذا الشهر</p>
                 </div>
-                <div className="w-12 h-12 bg-[#f3f4f6] rounded-full flex items-center justify-center">
-                  <Users className="w-6 h-6 text-[#4b5563]" />
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Users className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
+          {/* Products (Universities & Programs) */}
           <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#4b5563] mb-1">عدد المنتجات</p>
-                  <p className="text-2xl font-bold text-[#111827]">255</p>
+                  <p className="text-sm text-[#4b5563] mb-1">الجامعات والبرامج</p>
+                  <p className="text-2xl font-bold text-[#111827]">{stats.universities.total}</p>
+                  <p className="text-xs text-purple-600 mt-1">{stats.universities.programs} برنامج</p>
                 </div>
-                <div className="w-12 h-12 bg-[#f3f4f6] rounded-full flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-[#4b5563]" />
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                  <GraduationCap className="w-6 h-6 text-purple-600" />
                 </div>
               </div>
             </CardContent>
@@ -95,10 +224,12 @@ export default function ArabicDashboard() {
                   <Download className="w-4 h-4 ml-2" />
                   تصدير البيانات
                 </Button>
-                <Button size="sm" className="bg-[#111827] hover:bg-[#374151]">
-                  <Plus className="w-4 h-4 ml-2" />
-                  إضافة طلب
-                </Button>
+                <Link href="/dashboard/students">
+                  <Button size="sm" className="bg-[#111827] hover:bg-[#374151]">
+                    <Plus className="w-4 h-4 ml-2" />
+                    إضافة طلب
+                  </Button>
+                </Link>
               </div>
             </div>
           </CardHeader>
@@ -118,185 +249,163 @@ export default function ArabicDashboard() {
                   <SelectItem value="completed">مكتمل</SelectItem>
                 </SelectContent>
               </Select>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
                 تحديث
               </Button>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[#e5e7eb]">
-                    <th className="text-right p-3 text-sm font-medium text-[#4b5563]">إجراءات</th>
-                    <th className="text-right p-3 text-sm font-medium text-[#4b5563]">معلومات</th>
-                    <th className="text-right p-3 text-sm font-medium text-[#4b5563]">الحالة</th>
-                    <th className="text-right p-3 text-sm font-medium text-[#4b5563]">تاريخ الطلب</th>
-                    <th className="text-right p-3 text-sm font-medium text-[#4b5563]">المبلغ</th>
-                    <th className="text-right p-3 text-sm font-medium text-[#4b5563]">اسم الطالب</th>
-                    <th className="text-right p-3 text-sm font-medium text-[#4b5563]">رقم الطلب</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-[#f3f4f6]">
-                    <td className="p-3">
-                      <Button variant="outline" size="sm">
-                        عرض
-                      </Button>
-                    </td>
-                    <td className="p-3 text-sm text-[#111827]">مسدد بالكامل</td>
-                    <td className="p-3">
-                      <Badge variant="secondary" className="bg-[#f3f4f6] text-[#4b5563]">
-                        مكتمل
-                      </Badge>
-                    </td>
-                    <td className="p-3 text-sm text-[#4b5563]">2025-03-15</td>
-                    <td className="p-3 text-sm text-[#111827]">قيد المعالجة</td>
-                    <td className="p-3 text-sm text-[#111827]">صالح ياسين</td>
-                    <td className="p-3 text-sm text-[#111827]">#2025-231</td>
-                  </tr>
-                  <tr className="border-b border-[#f3f4f6]">
-                    <td className="p-3">
-                      <Button variant="outline" size="sm">
-                        عرض
-                      </Button>
-                    </td>
-                    <td className="p-3 text-sm text-[#111827]">بيانات ناقصة</td>
-                    <td className="p-3">
-                      <Badge variant="secondary" className="bg-[#f3f4f6] text-[#4b5563]">
-                        جاري
-                      </Badge>
-                    </td>
-                    <td className="p-3 text-sm text-[#4b5563]">2025-02-28</td>
-                    <td className="p-3 text-sm text-[#111827]">جاري</td>
-                    <td className="p-3 text-sm text-[#111827]">عبدالله سالم</td>
-                    <td className="p-3 text-sm text-[#111827]">#2025-189</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <RecentOrdersTable orders={stats.orders.recent} />
           </CardContent>
         </Card>
 
         {/* Additional Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Invoices Management */}
+          {/* Recent Commissions (Invoices) */}
           <Card className="bg-white">
             <CardHeader>
               <CardTitle className="text-[#111827]">إدارة الفواتير والمعاملات</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-[#f9fafb] rounded-lg">
-                  <div>
-                    <p className="text-sm font-medium text-[#111827]">صالح ياسين</p>
-                    <p className="text-xs text-[#4b5563]">رقم الفاتورة: INV-2025-0123</p>
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-[#111827]">1500$</p>
-                    <p className="text-xs text-[#4b5563]">2025-03-01</p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    عرض
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-[#f9fafb] rounded-lg">
-                  <div>
-                    <p className="text-sm font-medium text-[#111827]">محمد أحمد</p>
-                    <p className="text-xs text-[#4b5563]">رقم الفاتورة: INV-2025-0110</p>
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-[#111827]">950$</p>
-                    <p className="text-xs text-[#4b5563]">2025-02-28</p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    عرض
-                  </Button>
-                </div>
+                {stats.invoices.recent.length === 0 ? (
+                  <p className="text-center text-gray-500 py-4">لا توجد فواتير حالياً</p>
+                ) : (
+                  stats.invoices.recent.slice(0, 3).map((commission) => (
+                    <div key={commission.id} className="flex items-center justify-between p-3 bg-[#f9fafb] rounded-lg">
+                      <div>
+                        <p className="text-sm font-medium text-[#111827]">
+                          {commission.agent?.name || commission.order?.user?.fullName || 'غير معروف'}
+                        </p>
+                        <p className="text-xs text-[#4b5563]">
+                          رقم العمولة: COM-{commission.id.toString().padStart(4, '0')}
+                        </p>
+                      </div>
+                      <div className="text-left">
+                        <p className="text-sm font-medium text-[#111827]">{formatCurrency(commission.amount)}</p>
+                        <p className="text-xs text-[#4b5563]">
+                          {new Date(commission.createdAt).toLocaleDateString('ar-SA')}
+                        </p>
+                      </div>
+                      <Link href="/dashboard/commissions">
+                        <Button variant="outline" size="sm">
+                          عرض
+                        </Button>
+                      </Link>
+                    </div>
+                  ))
+                )}
+                {stats.invoices.pending > 0 && (
+                  <p className="text-xs text-amber-600 text-center">
+                    {stats.invoices.pending} عمولة قيد الانتظار
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Staff Management */}
+          {/* Top Agents */}
           <Card className="bg-white">
             <CardHeader>
               <CardTitle className="text-[#111827]">إدارة الوكلاء</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-[#f9fafb] rounded-lg">
-                  <div>
-                    <p className="text-sm font-medium text-[#111827]">أحمد محمود</p>
-                    <p className="text-xs text-[#4b5563]">مطور</p>
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-[#111827]">45</p>
-                    <p className="text-xs text-[#4b5563]">عدد المعاملات</p>
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-[#111827]">4500$</p>
-                    <p className="text-xs text-[#4b5563]">الراتب</p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    عرض
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-[#f9fafb] rounded-lg">
-                  <div>
-                    <p className="text-sm font-medium text-[#111827]">مريم سالم</p>
-                    <p className="text-xs text-[#4b5563]">مصممة</p>
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-[#111827]">27</p>
-                    <p className="text-xs text-[#4b5563]">عدد المعاملات</p>
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-[#111827]">3200$</p>
-                    <p className="text-xs text-[#4b5563]">الراتب</p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    عرض
-                  </Button>
-                </div>
+                {stats.partners.topPerformers.length === 0 ? (
+                  <p className="text-center text-gray-500 py-4">لا يوجد وكلاء حالياً</p>
+                ) : (
+                  stats.partners.topPerformers.slice(0, 3).map((agent) => (
+                    <div key={agent.id} className="flex items-center justify-between p-3 bg-[#f9fafb] rounded-lg">
+                      <div>
+                        <p className="text-sm font-medium text-[#111827]">{agent.name}</p>
+                        <p className="text-xs text-[#4b5563]">{agent.email}</p>
+                      </div>
+                      <div className="text-left">
+                        <p className="text-sm font-medium text-[#111827]">{agent.orderCount}</p>
+                        <p className="text-xs text-[#4b5563]">عدد المعاملات</p>
+                      </div>
+                      <div className="text-left">
+                        <p className="text-sm font-medium text-[#111827]">{formatCurrency(agent.totalEarnings)}</p>
+                        <p className="text-xs text-[#4b5563]">العمولات</p>
+                      </div>
+                      <Link href="/dashboard/agents">
+                        <Button variant="outline" size="sm">
+                          عرض
+                        </Button>
+                      </Link>
+                    </div>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="bg-white lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Monthly Orders Chart */}
+          <Card className="bg-white">
             <CardHeader>
               <CardTitle className="text-[#111827]">التقارير والمعاملات</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-[#4b5563] mb-2">التقرير الشهري - الطلبات</p>
-                  <p className="text-xs text-[#4b5563] mb-4">2025</p>
-                  <div className="h-32 bg-[#f3f4f6] rounded-lg flex items-center justify-center">
-                    <span className="text-[#4b5563] text-sm">رسم بياني الطلبات (شهري)</span>
-                  </div>
+              <div className="mb-4">
+                <p className="text-sm text-[#4b5563]">التقرير الشهري - الطلبات والإيرادات</p>
+              </div>
+              <OrdersChart data={chartData.monthlyOrders} />
+            </CardContent>
+          </Card>
+
+          {/* Agent Performance Chart */}
+          <Card className="bg-white">
+            <CardHeader>
+              <CardTitle className="text-[#111827]">أداء الوكلاء</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4">
+                <p className="text-sm text-[#4b5563]">أعلى 5 وكلاء حسب عدد الطلبات</p>
+              </div>
+              <AgentPerformanceChart data={chartData.agentPerformance} />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Additional Charts Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          {/* Status Distribution */}
+          <Card className="bg-white">
+            <CardHeader>
+              <CardTitle className="text-[#111827]">توزيع حالات الطلبات</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-8">
+                <div className="flex-1">
+                  <StatusDistributionChart data={chartData.statusDistribution} />
                 </div>
-                <div>
-                  <p className="text-sm text-[#4b5563] mb-2">التقرير السنوي - الموظفين</p>
-                  <p className="text-xs text-[#4b5563] mb-4">2025</p>
-                  <div className="h-32 bg-[#f3f4f6] rounded-lg flex items-center justify-center">
-                    <span className="text-[#4b5563] text-sm">رسم بياني الوكلاء (سنوي)</span>
-                  </div>
+                <div className="space-y-2">
+                  {chartData.statusDistribution.map((status) => (
+                    <div key={status.name} className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: status.color }}
+                      />
+                      <span className="text-sm text-gray-600">{status.name}: {status.value}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </CardContent>
           </Card>
 
+          {/* Daily Submissions */}
           <Card className="bg-white">
             <CardHeader>
-              <CardTitle className="text-[#111827]">الدخل/الأرباح</CardTitle>
+              <CardTitle className="text-[#111827]">طلبات التقديم اليومية</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xs text-[#4b5563] mb-4">2025</p>
-              <div className="h-40 bg-[#f3f4f6] rounded-lg flex items-center justify-center">
-                <span className="text-[#4b5563] text-sm">رسم بياني</span>
+              <div className="mb-4">
+                <p className="text-sm text-[#4b5563]">آخر 7 أيام</p>
               </div>
+              <DailySubmissionsChart data={chartData.dailySubmissions} />
             </CardContent>
           </Card>
         </div>
