@@ -180,7 +180,7 @@ export default function UniversityDetailPage() {
               </Link>
             </div>
 
-            <nav className="hidden md:flex items-center space-x-8 space-x-reverse">
+            <nav className="hidden md:flex items-center space-x-8 space-x-reverse" dir="rtl">
               <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
                 {t('nav.home')}
               </Link>
