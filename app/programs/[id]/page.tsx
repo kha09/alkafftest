@@ -30,6 +30,7 @@ import Image from 'next/image'
 
 import { Program, Department, University } from '@/lib/types'
 import { ApplicationForm } from '@/components/application-form'
+import { ContactFormDialog } from '@/components/contact-form-dialog'
 
 export default function ProgramDetailPage() {
   const params = useParams()
@@ -41,6 +42,7 @@ export default function ProgramDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [showApplicationForm, setShowApplicationForm] = useState<{ programId: number; programName: string } | false>(false)
+  const [showContactForm, setShowContactForm] = useState(false)
   
   // Parse fee data
   const yearlyFees = program?.yearlyTuitionFees ? JSON.parse(program.yearlyTuitionFees) : []
@@ -466,6 +468,7 @@ export default function ProgramDetailPage() {
                   size="lg"
                   variant="outline"
                   className="border-white text-blue-600 hover:bg-white transform hover:scale-105 transition-all duration-200"
+                  onClick={() => setShowContactForm(true)}
                 >
                   {t('program.detail.cta.expert')}
                 </Button>
@@ -482,6 +485,11 @@ export default function ProgramDetailPage() {
           onClose={() => setShowApplicationForm(false)} 
         />
       )}
+      
+      <ContactFormDialog 
+        open={showContactForm} 
+        onOpenChange={setShowContactForm} 
+      />
     </div>
   )
 }

@@ -26,6 +26,7 @@ import Image from 'next/image'
 
 import { Program, Department, University } from '@/lib/types'
 import { ApplicationForm } from '@/components/application-form'
+import { ContactFormDialog } from '@/components/contact-form-dialog'
 
 export default function UniversityDetailPage() {
   const params = useParams()
@@ -39,6 +40,7 @@ export default function UniversityDetailPage() {
   const [selectedDepartment, setSelectedDepartment] = useState<number | 'all'>('all')
   const [selectedDuration, setSelectedDuration] = useState<string | 'all'>('all')
   const [showApplicationForm, setShowApplicationForm] = useState<{ programId: number; programName: string } | false>(false)
+  const [showContactForm, setShowContactForm] = useState(false)
   
   // Ref for debouncing search
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null)
@@ -256,7 +258,10 @@ export default function UniversityDetailPage() {
               </div>
               
               <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                <Button className="bg-white text-blue-600 hover:bg-gray-100">
+                <Button 
+                  className="bg-white text-blue-600 hover:bg-gray-100"
+                  onClick={() => setShowContactForm(true)}
+                >
                   {t('university.detail.contact.expert')}
                 </Button>
                 {/* <Button variant="outline" className="border-white text-blue-600 hover:bg-white">
@@ -459,6 +464,7 @@ export default function UniversityDetailPage() {
                 size="lg"
                 variant="outline"
                 className="border-white text-blue-600 hover:bg-white transform hover:scale-105 transition-all duration-200"
+                onClick={() => setShowContactForm(true)}
               >
                 {t('university.detail.cta.expert')}
               </Button>
@@ -475,6 +481,11 @@ export default function UniversityDetailPage() {
           onClose={() => setShowApplicationForm(false)} 
         />
       )}
+      
+      <ContactFormDialog 
+        open={showContactForm} 
+        onOpenChange={setShowContactForm} 
+      />
     </div>
   )
 }
