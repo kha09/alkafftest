@@ -292,12 +292,12 @@ export default function LandingPage() {
               <Link href="/universities" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
                 {t('nav.universities')}
               </Link>
-              <Link href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
+              {/* <Link href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
                 {t('nav.about')}
               </Link>
               <Link href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
                 {t('nav.contact')}
-              </Link>
+              </Link> */}
             </nav>
 
             <div className="flex items-center space-x-4" dir="rtl">
@@ -2124,11 +2124,11 @@ export default function LandingPage() {
                     {t('nav.universities')}
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
                     {t('nav.about')}
                   </Link>
-                </li>
+                </li> */}
               </ul>
             </div>
 

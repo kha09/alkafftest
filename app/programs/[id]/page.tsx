@@ -179,12 +179,12 @@ export default function ProgramDetailPage() {
               <Link href="/universities" className="text-blue-600 font-medium">
                 {t('nav.universities')}
               </Link>
-              <Link href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
+              {/* <Link href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
                 {t('nav.about')}
               </Link>
               <Link href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200">
                 {t('nav.contact')}
-              </Link>
+              </Link> */}
             </nav>
 
             <div className="flex items-center space-x-4 space-x-reverse">
