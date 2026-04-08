@@ -312,9 +312,9 @@ export default function ProgramDetailPage() {
                   <BookOpen className="ml-2 h-5 w-5" />
                   {t('program.detail.apply.now')}
                 </Button>
-                <Button variant="outline">
+                {/* <Button variant="outline">
                   {t('program.detail.consultation')}
-                </Button>
+                </Button> */}
               </div>
             </CardContent>
           </Card>
@@ -455,13 +455,13 @@ export default function ProgramDetailPage() {
                 {t('program.detail.cta.description')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
+                {/* <Button
                   size="lg"
                   className="bg-white text-blue-600 hover:bg-gray-100 transform hover:scale-105 transition-all duration-200"
                 >
                   <GraduationCap className="ml-2 h-5 w-5" />
                   {t('program.detail.cta.consultation')}
-                </Button>
+                </Button> */}
                 <Button
                   size="lg"
                   variant="outline"

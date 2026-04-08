@@ -259,9 +259,9 @@ export default function UniversityDetailPage() {
                 <Button className="bg-white text-blue-600 hover:bg-gray-100">
                   {t('university.detail.contact.expert')}
                 </Button>
-                <Button variant="outline" className="border-white text-blue-600 hover:bg-white">
+                {/* <Button variant="outline" className="border-white text-blue-600 hover:bg-white">
                   {t('university.detail.ask.us')}
-                </Button>
+                </Button> */}
               </div>
             </div>
           </div>
@@ -448,13 +448,13 @@ export default function UniversityDetailPage() {
               {t('university.detail.cta.description')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
+              {/* <Button
                 size="lg"
                 className="bg-white text-blue-600 hover:bg-gray-100 transform hover:scale-105 transition-all duration-200"
               >
                 <GraduationCap className="ml-2 h-5 w-5" />
                 {t('university.detail.cta.consultation')}
-              </Button>
+              </Button> */}
               <Button
                 size="lg"
                 variant="outline"
