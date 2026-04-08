@@ -48,6 +48,7 @@ import {
 import Image from "next/image"
 import { HomePageContent } from "@/lib/types"
 import { ApplicationForm } from "@/components/application-form"
+import { ContactFormDialog } from "@/components/contact-form-dialog"
 
 // Create a mapping from icon names to icon components
 const iconMap: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
@@ -93,6 +94,7 @@ export default function LandingPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showApplicationForm, setShowApplicationForm] = useState(false)
+  const [showContactForm, setShowContactForm] = useState(false)
   
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentUniversity, setCurrentUniversity] = useState(0)
@@ -1917,6 +1919,7 @@ export default function LandingPage() {
                     size="lg"
                     variant="outline"
                     className="border-white text-blue-600 hover:bg-white transform hover:scale-105 transition-all duration-200"
+                    onClick={() => setShowContactForm(true)}
                   >
                     <Mail className="mr-2 h-5 w-5" />
                     {t('homepage.email.us')}
@@ -2073,6 +2076,11 @@ export default function LandingPage() {
           onClose={() => setShowApplicationForm(false)} 
         />
       )}
+      
+      <ContactFormDialog 
+        open={showContactForm} 
+        onOpenChange={setShowContactForm} 
+      />
     </div>
   )
 }
