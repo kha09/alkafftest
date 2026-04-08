@@ -860,10 +860,10 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              {content.whySMAlkaff?.title || "لماذا SM Alkaff؟"}
+              {content.whySMAlkaff?.title || t('homepage.why.choose.title')}
             </h2>
             <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              {content.whySMAlkaff?.description || "نحن نجعل رحلة التقديم الجامعي أسهل وأكثر فعالية من خلال منصتنا المتطورة والمبتكرة"}
+              {content.whySMAlkaff?.description || t('homepage.discover.difference')}
             </p>
           </div>
 
@@ -1036,10 +1036,10 @@ export default function LandingPage() {
                 <span>{t('homepage.simple.process')}</span>
               </div>
             <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              {content.howItWorks?.title || "كيف تعمل المنصة؟"}
+              {content.howItWorks?.title || t('homepage.how.it.works.title')}
             </h2>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              {content.howItWorks?.description || "رحلة تفاعلية بسيطة تقودك إلى حلمك الجامعي خطوة بخطوة - من التسجيل إلى القبول"}
+              {content.howItWorks?.description || t('homepage.how.it.works.description')}
             </p>
           </div>
 
@@ -1119,10 +1119,10 @@ export default function LandingPage() {
           {/* Process Statistics */}
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { number: "3", label: "دقائق للتسجيل", icon: Users, color: "from-blue-500 to-cyan-500" },
-              { number: "24", label: "ساعة للمراجعة", icon: FileText, color: "from-green-500 to-emerald-500" },
-              { number: "7", label: "أيام للقبول", icon: Award, color: "from-purple-500 to-pink-500" },
-              { number: "100%", label: "أمان مضمون", icon: Shield, color: "from-orange-500 to-red-500" },
+              { number: "3", label: t('homepage.minutes.register'), icon: Users, color: "from-blue-500 to-cyan-500" },
+              { number: "24", label: t('homepage.hours.review'), icon: FileText, color: "from-green-500 to-emerald-500" },
+              { number: "7", label: t('homepage.days.accept'), icon: Award, color: "from-purple-500 to-pink-500" },
+              { number: "100%", label: t('homepage.security.guaranteed'), icon: Shield, color: "from-orange-500 to-red-500" },
             ].map((stat, index) => (
               <div
                 key={index}
@@ -1217,13 +1217,13 @@ export default function LandingPage() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in-up">
               <Users className="h-4 w-4" />
-              <span>انضم إلينا اليوم</span>
+              <span>{t('homepage.join.today')}</span>
             </div>
             <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              اختر المسار المناسب لك
+              {t('homepage.choose.path')}
             </h2>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              سواء كنت طالباً تبحث عن فرصتك الأكاديمية أو وكيلاً ترغب في مساعدة الطلاب، لدينا ما يناسبك
+              {t('homepage.choose.path.description')}
             </p>
           </div>
 
@@ -1267,20 +1267,20 @@ export default function LandingPage() {
                       </div>
 
                       <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
-                        للطلاب
+                        {t('homepage.for.students')}
                       </h3>
 
                       <p className="text-xl mb-6 text-gray-600 max-w-md mx-auto">
-                        تقديمك يبدأ هنا — استكشف الجامعات العالمية بنقرة واحدة
+                        {t('homepage.student.description')}
                       </p>
 
                       {/* Features */}
                       <div className="grid grid-cols-2 gap-4 mb-8">
                         {[
-                          { icon: Globe, text: "500+ جامعة عالمية" },
-                          { icon: BookOpen, text: "1000+ تخصص دراسي" },
-                          { icon: Shield, text: "تقديم آمن ومضمون" },
-                          { icon: Zap, text: "قبول سريع خلال أيام" },
+                          { icon: Globe, text: t('homepage.students.feature.universities') },
+                          { icon: BookOpen, text: t('homepage.students.feature.programs') },
+                          { icon: Shield, text: t('homepage.students.feature.secure') },
+                          { icon: Zap, text: t('homepage.students.feature.fast') },
                         ].map((feature, index) => (
                           <div
                             key={index}
@@ -1301,19 +1301,19 @@ export default function LandingPage() {
                         <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                           5000+
                         </div>
-                        <div className="text-xs text-gray-500">طالب مسجل</div>
+                        <div className="text-xs text-gray-500">{t('homepage.registered.students')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                           95%
                         </div>
-                        <div className="text-xs text-gray-500">معدل القبول</div>
+                        <div className="text-xs text-gray-500">{t('homepage.acceptance.rate')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                           7
                         </div>
-                        <div className="text-xs text-gray-500">أيام للقبول</div>
+                        <div className="text-xs text-gray-500">{t('homepage.days.acceptance.short')}</div>
                       </div>
                     </div>
 
@@ -1322,7 +1322,7 @@ export default function LandingPage() {
                       size="lg"
                       className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 group-hover:animate-pulse"
                     >
-                      سجّل كطالب
+                      {t('homepage.register.student')}
                       <ArrowRight className="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" />
                     </Button>
                   </div>
@@ -1331,7 +1331,7 @@ export default function LandingPage() {
 
               {/* Hover Badge */}
               <div className="absolute -top-4 -right-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
-                ابدأ مجاناً
+                {t('homepage.start.free')}
               </div>
             </div>
 
@@ -1374,20 +1374,20 @@ export default function LandingPage() {
                       </div>
 
                       <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
-                        للوكلاء
+                        {t('homepage.for.agents')}
                       </h3>
 
                       <p className="text-xl mb-6 text-gray-600 max-w-md mx-auto">
-                        هل أنت وكيل؟ قم بمساعدة الطلاب واحصل على عمولات مجزية
+                        {t('homepage.agent.description')}
                       </p>
 
                       {/* Features */}
                       <div className="grid grid-cols-2 gap-4 mb-8">
                         {[
-                          { icon: CreditCard, text: "عمولات مجزية" },
-                          { icon: UserCheck, text: "دعم فني متكامل" },
-                          { icon: Globe, text: "عملاء من 50+ دولة" },
-                          { icon: Award, text: "شهادة وكيل معتمد" },
+                          { icon: CreditCard, text: t('homepage.agents.feature.commission') },
+                          { icon: UserCheck, text: t('homepage.agents.feature.support') },
+                          { icon: Globe, text: t('homepage.agents.feature.clients') },
+                          { icon: Award, text: t('homepage.agents.feature.certified') },
                         ].map((feature, index) => (
                           <div
                             key={index}
@@ -1408,19 +1408,19 @@ export default function LandingPage() {
                         <div className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                           200+
                         </div>
-                        <div className="text-xs text-gray-500">وكيل معتمد</div>
+                        <div className="text-xs text-gray-500">{t('homepage.certified.agent')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                           15%
                         </div>
-                        <div className="text-xs text-gray-500">نسبة العمولة</div>
+                        <div className="text-xs text-gray-500">{t('homepage.commission.rate')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                           24/7
                         </div>
-                        <div className="text-xs text-gray-500">دعم فني</div>
+                        <div className="text-xs text-gray-500">{t('homepage.tech.support')}</div>
                       </div>
                     </div>
 
@@ -1429,7 +1429,7 @@ export default function LandingPage() {
                       size="lg"
                       className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 group-hover:animate-pulse"
                     >
-                      انضم كوكيل
+                      {t('homepage.join.agent')}
                       <ArrowRight className="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" />
                     </Button>
                   </div>
@@ -1438,7 +1438,7 @@ export default function LandingPage() {
 
               {/* Hover Badge */}
               <div className="absolute -top-4 -right-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
-                عمولات مجزية
+                {t('homepage.rewarding.commissions')}
               </div>
             </div>
           </div>
@@ -1526,7 +1526,7 @@ export default function LandingPage() {
                   : "bg-white/10 text-gray-300 hover:bg-white/20"
               }`}
             >
-              جميع الشهادات
+              {t('homepage.all.testimonials')}
             </button>
             <button
               onClick={() => setActiveTestimonialFilter("بكالوريوس")}
@@ -1536,7 +1536,7 @@ export default function LandingPage() {
                   : "bg-white/10 text-gray-300 hover:bg-white/20"
               }`}
             >
-              البكالوريوس
+              {t('homepage.bachelor')}
             </button>
             <button
               onClick={() => setActiveTestimonialFilter("ماجستير")}
@@ -1546,7 +1546,7 @@ export default function LandingPage() {
                   : "bg-white/10 text-gray-300 hover:bg-white/20"
               }`}
             >
-              الماجستير
+              {t('homepage.master')}
             </button>
             <button
               onClick={() => setActiveTestimonialFilter("دكتوراه")}
@@ -1556,7 +1556,7 @@ export default function LandingPage() {
                   : "bg-white/10 text-gray-300 hover:bg-white/20"
               }`}
             >
-              الدكتوراه
+              {t('homepage.phd')}
             </button>
           </div>
 
@@ -1575,7 +1575,7 @@ export default function LandingPage() {
                   <div className="bg-black rounded-xl overflow-hidden aspect-video">
                     {/* This would be a real video in production */}
                     <div className="w-full h-full bg-gradient-to-br from-indigo-900 to-purple-900 flex items-center justify-center">
-                      <p className="text-white text-xl">فيديو الشهادة</p>
+                      <p className="text-white text-xl">{t('homepage.testimonial.video')}</p>
                     </div>
                   </div>
                 </div>
@@ -1695,7 +1695,7 @@ export default function LandingPage() {
                                       </div>
                                     </div>
 
-                                    <p className="mt-4 text-white text-sm">شاهد الشهادة كاملة</p>
+                                    <p className="mt-4 text-white text-sm">{t('homepage.watch.full')}</p>
                                   </div>
                                 ) : (
                                   <div className="relative">
@@ -1719,7 +1719,7 @@ export default function LandingPage() {
                                 {testimonial.featured && (
                                   <div className="absolute top-0 right-0 bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-4 py-1 rounded-br-2xl rounded-tl-2xl text-sm font-bold shadow-lg">
                                     <Crown className="h-4 w-4 inline-block mr-1" />
-                                    قصة نجاح مميزة
+                                    {t('homepage.featured.success')}
                                   </div>
                                 )}
                               </div>
@@ -1768,7 +1768,7 @@ export default function LandingPage() {
             {/* Swipe Indicator */}
             <div className="text-center mt-6 text-gray-400 text-sm flex items-center justify-center">
               <ChevronLeft className="h-4 w-4 mr-1" />
-              <span>اسحب للتنقل بين الشهادات</span>
+              <span>{t('homepage.swipe.navigate')}</span>
               <ChevronRight className="h-4 w-4 ml-1" />
             </div>
           </div>
@@ -1835,13 +1835,13 @@ export default function LandingPage() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in-up">
               <HelpCircle className="h-4 w-4" />
-              <span>نحن هنا للمساعدة</span>
+              <span>{t('homepage.here.to.help')}</span>
             </div>
             <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              الأسئلة الشائعة
+              {t('homepage.faq.title')}
             </h2>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              إجابات على أكثر الأسئلة شيوعاً حول خدماتنا وعملية التقديم
+              {t('homepage.faq.description')}
             </p>
           </div>
 
@@ -1852,7 +1852,7 @@ export default function LandingPage() {
               <div className="relative w-full md:w-2/3">
                 <input
                   type="text"
-                  placeholder="ابحث عن سؤال..."
+                  placeholder={t('homepage.search.placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full px-5 py-3 pl-12 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
@@ -1885,7 +1885,7 @@ export default function LandingPage() {
             <div className="max-w-4xl mx-auto mb-12">
               <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
                 <Star className="h-5 w-5 text-yellow-500 mr-2" />
-                الأسئلة الأكثر شيوعاً
+                {t('homepage.most.popular')}
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 {content.faqs
@@ -1950,7 +1950,7 @@ export default function LandingPage() {
                     </h3>
                     {faq.popular && (
                       <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-medium mr-4">
-                        شائع
+                        {t('homepage.popular')}
                       </div>
                     )}
                   </button>
@@ -1969,7 +1969,7 @@ export default function LandingPage() {
                         <div className="mt-6 pt-4 border-t border-gray-200">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
-                              <span className="text-sm text-gray-600">هل كانت هذه الإجابة مفيدة؟</span>
+                              <span className="text-sm text-gray-600">{t('homepage.helpful')}</span>
                               <div className="flex space-x-2">
                                 <button
                                   onClick={() => markFaqHelpful(faq.id, true)}
@@ -1996,7 +1996,7 @@ export default function LandingPage() {
 
                             {helpfulFaqs[faq.id] !== undefined && (
                               <div className="text-sm text-gray-500">
-                                {helpfulFaqs[faq.id] ? "شكراً لك!" : "سنحسن إجابتنا"}
+                                {helpfulFaqs[faq.id] ? t('homepage.thanks') : t('homepage.will.improve')}
                               </div>
                             )}
                           </div>
@@ -2011,8 +2011,8 @@ export default function LandingPage() {
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Search className="h-8 w-8 text-gray-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">لم نجد أي نتائج</h3>
-                <p className="text-gray-500">جرب البحث بكلمات مختلفة أو تصفح الفئات المختلفة</p>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">{t('homepage.no.results')}</h3>
+                <p className="text-gray-500">{t('homepage.try.different')}</p>
               </div>
             )}
           </div>
@@ -2030,9 +2030,9 @@ export default function LandingPage() {
                 <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
                   <MessageCircle className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">لا تزال لديك أسئلة؟</h3>
+                <h3 className="text-2xl font-bold mb-4">{t('homepage.still.questions.title')}</h3>
                 <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
-                  فريق الدعم لدينا متاح على مدار الساعة للإجابة على جميع استفساراتك ومساعدتك في رحلتك التعليمية
+                  {t('homepage.support.description')}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button
@@ -2040,7 +2040,7 @@ export default function LandingPage() {
                     className="bg-white text-blue-600 hover:bg-gray-100 transform hover:scale-105 transition-all duration-200"
                   >
                     <MessageCircle className="mr-2 h-5 w-5" />
-                    دردشة مباشرة
+                    {t('homepage.direct.chat')}
                   </Button>
                   <Button
                     size="lg"
@@ -2048,7 +2048,7 @@ export default function LandingPage() {
                     className="border-white text-blue-600 hover:bg-white transform hover:scale-105 transition-all duration-200"
                   >
                     <Mail className="mr-2 h-5 w-5" />
-                    راسلنا
+                    {t('homepage.email.us')}
                   </Button>
                 </div>
               </div>
