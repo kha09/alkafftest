@@ -32,6 +32,7 @@ export default function UniversitiesManagement() {
   const [error, setError] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentUniversity, setCurrentUniversity] = useState<UniversityFormData | null>(null)
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
   const { toast } = useToast()
 
   // Search and filter states
@@ -73,6 +74,21 @@ export default function UniversitiesManagement() {
     }
   }
 
+  const validateForm = (): boolean => {
+    if (!currentUniversity) return false
+    const errors: Record<string, string> = {}
+
+    if (!currentUniversity.name.trim()) errors.name = 'اسم الجامعة مطلوب'
+    if (!currentUniversity.country.trim()) errors.country = 'الدولة مطلوبة'
+    if (!currentUniversity.ranking.trim()) errors.ranking = 'الترتيب العالمي مطلوب'
+    if (!currentUniversity.students.trim()) errors.students = 'عدد الطلاب مطلوب'
+    if (!currentUniversity.programs.trim()) errors.programs = 'عدد البرامج مطلوب'
+    if (!currentUniversity.acceptance.trim()) errors.acceptance = 'معدل القبول مطلوب'
+
+    setFormErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleCreate = () => {
     const newUniversity: UniversityFormData = {
       id: 0,
@@ -87,16 +103,17 @@ export default function UniversitiesManagement() {
       flag: '',
       freeOfferLetter: false
     };
+    setFormErrors({})
     setCurrentUniversity(newUniversity)
     setIsDialogOpen(true)
   }
 
   const handleEdit = (university: University) => {
-    // Convert University to UniversityFormData
     const universityFormData: UniversityFormData = {
       ...university,
       logo: university.logo
     };
+    setFormErrors({})
     setCurrentUniversity(universityFormData)
     setIsDialogOpen(true)
   }
@@ -120,7 +137,8 @@ export default function UniversitiesManagement() {
 
   const handleSave = async () => {
     if (!currentUniversity) return
-    
+    if (!validateForm()) return
+
     try {
       const method = currentUniversity.id ? 'PUT' : 'POST'
       const url = currentUniversity.id ? `/api/universities/${currentUniversity.id}?language=${selectedLanguage}` : `/api/universities?language=${selectedLanguage}`
@@ -173,6 +191,13 @@ export default function UniversitiesManagement() {
         ...currentUniversity,
         [field]: value
       })
+      if (formErrors[field as string]) {
+        setFormErrors(prev => {
+          const next = { ...prev }
+          delete next[field as string]
+          return next
+        })
+      }
     }
   }
 
@@ -183,6 +208,13 @@ export default function UniversitiesManagement() {
         country: countryData.country,
         flag: countryData.flag
       })
+      if (formErrors.country) {
+        setFormErrors(prev => {
+          const next = { ...prev }
+          delete next.country
+          return next
+        })
+      }
     }
   }
 
@@ -331,23 +363,32 @@ export default function UniversitiesManagement() {
                     اسم الجامعة
                     <span className="text-red-500 mr-1">*</span>
                   </Label>
-                  <Input
-                    id="name"
-                    value={currentUniversity.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="col-span-3"
-                    placeholder="أدخل اسم الجامعة"
-                    required
-                  />
+                  <div className="col-span-3 space-y-1">
+                    <Input
+                      id="name"
+                      value={currentUniversity.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      className={formErrors.name ? 'border-red-500' : ''}
+                      placeholder="أدخل اسم الجامعة"
+                    />
+                    {formErrors.name && (
+                      <p className="text-sm text-red-500">{formErrors.name}</p>
+                    )}
+                  </div>
                 </div>
 
-                <CountrySelect
-                  label="الدولة"
-                  value={{ country: currentUniversity.country, flag: currentUniversity.flag }}
-                  onChange={handleCountryChange}
-                  required
-                  placeholder="اختر دولة الجامعة"
-                />
+                <div className="space-y-1">
+                  <CountrySelect
+                    label="الدولة"
+                    value={{ country: currentUniversity.country, flag: currentUniversity.flag }}
+                    onChange={handleCountryChange}
+                    required
+                    placeholder="اختر دولة الجامعة"
+                  />
+                  {formErrors.country && (
+                    <p className="text-sm text-red-500 text-right">{formErrors.country}</p>
+                  )}
+                </div>
 
                 <EnhancedFileUpload
                   label="شعار الجامعة"
@@ -369,14 +410,18 @@ export default function UniversitiesManagement() {
                     الترتيب العالمي
                     <span className="text-red-500 mr-1">*</span>
                   </Label>
-                  <Input
-                    id="ranking"
-                    value={currentUniversity.ranking}
-                    onChange={(e) => handleInputChange('ranking', e.target.value)}
-                    className="col-span-3"
-                    placeholder="مثال: #150 عالمياً"
-                    required
-                  />
+                  <div className="col-span-3 space-y-1">
+                    <Input
+                      id="ranking"
+                      value={currentUniversity.ranking}
+                      onChange={(e) => handleInputChange('ranking', e.target.value)}
+                      className={formErrors.ranking ? 'border-red-500' : ''}
+                      placeholder="مثال: #150 عالمياً"
+                    />
+                    {formErrors.ranking && (
+                      <p className="text-sm text-red-500">{formErrors.ranking}</p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -384,14 +429,18 @@ export default function UniversitiesManagement() {
                     عدد الطلاب
                     <span className="text-red-500 mr-1">*</span>
                   </Label>
-                  <Input
-                    id="students"
-                    value={currentUniversity.students}
-                    onChange={(e) => handleInputChange('students', e.target.value)}
-                    className="col-span-3"
-                    placeholder="مثال: 25,000+ طالب"
-                    required
-                  />
+                  <div className="col-span-3 space-y-1">
+                    <Input
+                      id="students"
+                      value={currentUniversity.students}
+                      onChange={(e) => handleInputChange('students', e.target.value)}
+                      className={formErrors.students ? 'border-red-500' : ''}
+                      placeholder="مثال: 25,000+ طالب"
+                    />
+                    {formErrors.students && (
+                      <p className="text-sm text-red-500">{formErrors.students}</p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -399,14 +448,18 @@ export default function UniversitiesManagement() {
                     عدد البرامج
                     <span className="text-red-500 mr-1">*</span>
                   </Label>
-                  <Input
-                    id="programs"
-                    value={currentUniversity.programs}
-                    onChange={(e) => handleInputChange('programs', e.target.value)}
-                    className="col-span-3"
-                    placeholder="مثال: 200+ برنامج"
-                    required
-                  />
+                  <div className="col-span-3 space-y-1">
+                    <Input
+                      id="programs"
+                      value={currentUniversity.programs}
+                      onChange={(e) => handleInputChange('programs', e.target.value)}
+                      className={formErrors.programs ? 'border-red-500' : ''}
+                      placeholder="مثال: 200+ برنامج"
+                    />
+                    {formErrors.programs && (
+                      <p className="text-sm text-red-500">{formErrors.programs}</p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -414,14 +467,18 @@ export default function UniversitiesManagement() {
                     معدل القبول
                     <span className="text-red-500 mr-1">*</span>
                   </Label>
-                  <Input
-                    id="acceptance"
-                    value={currentUniversity.acceptance}
-                    onChange={(e) => handleInputChange('acceptance', e.target.value)}
-                    className="col-span-3"
-                    placeholder="مثال: 75%"
-                    required
-                  />
+                  <div className="col-span-3 space-y-1">
+                    <Input
+                      id="acceptance"
+                      value={currentUniversity.acceptance}
+                      onChange={(e) => handleInputChange('acceptance', e.target.value)}
+                      className={formErrors.acceptance ? 'border-red-500' : ''}
+                      placeholder="مثال: 75%"
+                    />
+                    {formErrors.acceptance && (
+                      <p className="text-sm text-red-500">{formErrors.acceptance}</p>
+                    )}
+                  </div>
                 </div>
               </div>
 
