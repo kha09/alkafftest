@@ -1,0 +1,24 @@
+# Local development database only — the Next.js app itself runs on the host.
+# Usage: docker compose -f docker-compose.local.yml up -d
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: alkaffpro-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: alkaffpro
+      POSTGRES_PASSWORD: alkaffpro
+      POSTGRES_DB: alkaffpro
+    ports:
+      # 5433 on the host (5432 is already used by another local project)
+      - "5433:5432"
+    volumes:
+      - alkaffpro_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alkaffpro -d alkaffpro"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  alkaffpro_pgdata:
